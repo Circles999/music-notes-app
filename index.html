@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>I ♥ Music Notes - Professional Music Transcription</title>
+    <!-- Add jsPDF library for real PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -515,7 +517,7 @@
                 </div>
                 
                 <div class="controls" id="downloadControls" style="display: none;">
-                    <button class="btn btn-primary" id="downloadPdfBtn">📄 Download Sheet Music</button>
+                    <button class="btn btn-primary" id="downloadPdfBtn">📄 Download PDF</button>
                     <button class="btn btn-secondary" id="downloadMidiBtn">🎹 Download MIDI</button>
                     <button class="btn btn-secondary" id="downloadTxtBtn">📝 Download Text</button>
                 </div>
@@ -543,7 +545,7 @@
                 <div class="feature-card">
                     <div class="feature-icon">💾</div>
                     <h3>Professional Downloads</h3>
-                    <p>High-quality downloads that musicians can read and perform from</p>
+                    <p>High-quality PDFs that musicians can read and perform from</p>
                 </div>
             </div>
         </div>
@@ -818,124 +820,104 @@
             updateStatus('Professional Transcription Complete!', 'ready');
         }
 
-        // Simplified PNG download (working version)
+        // FIXED: Real PDF generation using jsPDF
         function generateProfessionalPDF() {
+            // Check if jsPDF is loaded
+            if (typeof window.jspdf === 'undefined') {
+                console.error('jsPDF library not loaded');
+                alert('PDF generation library not loaded. Please refresh the page and try again.');
+                return;
+            }
+
             const timestamp = Date.now();
-            const filename = `professional-sheet-music-${timestamp}.png`;
+            const filename = `professional-sheet-music-${timestamp}.pdf`;
             
-            const canvas = document.createElement('canvas');
-            canvas.width = 1400;
-            canvas.height = 1000;
-            const ctx = canvas.getContext('2d');
-            
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = 'black';
-            ctx.font = 'bold 32px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('I ♥ Music Notes', canvas.width / 2, 80);
-            
-            ctx.font = '20px Arial';
-            ctx.fillText('Professional Sheet Music Transcription', canvas.width / 2, 110);
-            
-            ctx.font = '14px Arial';
-            ctx.fillText(`Generated: ${new Date().toLocaleString()}`, canvas.width / 2, 140);
-            
-            const staffY = 250;
-            const staffSpacing = 18;
-            const staffWidth = 1100;
-            const staffStartX = 150;
-            
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            
-            for (let i = 0; i < 5; i++) {
-                ctx.beginPath();
-                ctx.moveTo(staffStartX, staffY + (i * staffSpacing));
-                ctx.lineTo(staffStartX + staffWidth, staffY + (i * staffSpacing));
-                ctx.stroke();
-            }
-            
-            ctx.font = '80px Times New Roman';
-            ctx.fillStyle = 'black';
-            ctx.textAlign = 'left';
-            ctx.fillText('𝄞', staffStartX + 20, staffY + 55);
-            
-            ctx.font = '36px Times New Roman';
-            ctx.fillText('4', staffStartX + 120, staffY + 25);
-            ctx.fillText('4', staffStartX + 120, staffY + 55);
-            
-            ctx.lineWidth = 1;
-            const measureWidth = 180;
-            for (let i = 1; i <= 5; i++) {
-                const x = staffStartX + (i * measureWidth);
-                ctx.beginPath();
-                ctx.moveTo(x, staffY);
-                ctx.lineTo(x, staffY + (4 * staffSpacing));
-                ctx.stroke();
-            }
-            
-            ctx.fillStyle = 'black';
-            let noteX = staffStartX + 160;
-            const noteSpacing = 45;
-            
-            professionalNotes.forEach((notation, index) => {
-                if (noteX > staffStartX + staffWidth - 100) return;
+            try {
+                // Create new jsPDF instance
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('landscape', 'mm', 'a4');
                 
-                const position = professionalNotePositions[notation.note] || professionalNotePositions['G'];
-                const noteY = staffY + (position.y - 50);
+                // Professional header
+                doc.setFontSize(24);
+                doc.setFont('helvetica', 'bold');
+                doc.text('I ♥ Music Notes', 148, 30, { align: 'center' });
                 
-                if (position.ledger) {
-                    ctx.beginPath();
-                    ctx.moveTo(noteX - 20, noteY);
-                    ctx.lineTo(noteX + 20, noteY);
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Professional Sheet Music Transcription', 148, 40, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 50, { align: 'center' });
+                
+                // Staff system
+                const staffY = 80;
+                const staffSpacing = 8;
+                const staffWidth = 200;
+                const staffStartX = 50;
+                
+                // Draw staff lines
+                doc.setLineWidth(0.5);
+                for (let i = 0; i < 5; i++) {
+                    const y = staffY + (i * staffSpacing);
+                    doc.line(staffStartX, y, staffStartX + staffWidth, y);
                 }
                 
-                ctx.save();
-                ctx.translate(noteX, noteY);
-                ctx.rotate(-Math.PI / 8);
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 10, 7, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                // Add treble clef symbol
+                doc.setFontSize(40);
+                doc.setFont('times', 'normal');
+                doc.text('♪', staffStartX + 10, staffY + 25);
                 
-                const stemDirection = noteY > staffY + 36 ? -1 : 1;
-                ctx.beginPath();
-                ctx.moveTo(noteX + (stemDirection > 0 ? 8 : -8), noteY);
-                ctx.lineTo(noteX + (stemDirection > 0 ? 8 : -8), noteY + (stemDirection * 55));
-                ctx.lineWidth = 2;
-                ctx.stroke();
+                // Add time signature
+                doc.setFontSize(20);
+                doc.text('4', staffStartX + 30, staffY + 10);
+                doc.text('4', staffStartX + 30, staffY + 20);
                 
-                noteX += noteSpacing;
-            });
-            
-            ctx.font = '14px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Key: ${chords[Math.floor(Math.random() * chords.length)]} Major  |  Time: 4/4  |  Notes: ${professionalNotes.length}`, canvas.width / 2, staffY + 150);
-            
-            canvas.toBlob(function(blob) {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
+                // Draw measure lines
+                doc.setLineWidth(0.3);
+                const measureWidth = 40;
+                for (let i = 1; i <= 4; i++) {
+                    const x = staffStartX + (i * measureWidth);
+                    doc.line(x, staffY, x, staffY + (4 * staffSpacing));
+                }
                 
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 1000);
+                // Add notes
+                let noteX = staffStartX + 50;
+                const noteSpacing = 15;
                 
+                professionalNotes.forEach((notation, index) => {
+                    if (noteX > staffStartX + staffWidth - 20) return;
+                    
+                    // Draw note (filled circle)
+                    doc.circle(noteX, staffY + 20, 2, 'F');
+                    
+                    // Draw stem
+                    doc.line(noteX + 1.5, staffY + 20, noteX + 1.5, staffY + 5);
+                    
+                    // Add note name below staff
+                    doc.setFontSize(8);
+                    doc.text(notation.note, noteX - 2, staffY + 50);
+                    
+                    noteX += noteSpacing;
+                });
+                
+                // Add footer
+                doc.setFontSize(10);
+                doc.text(`Key: ${chords[Math.floor(Math.random() * chords.length)]} Major  |  Time: 4/4  |  Notes: ${professionalNotes.length}`, 148, staffY + 70, { align: 'center' });
+                
+                // Save the PDF
+                doc.save(filename);
+                
+                // Success feedback
                 const originalText = document.getElementById('downloadPdfBtn').textContent;
-                document.getElementById('downloadPdfBtn').textContent = '✅ Sheet Music Downloaded!';
+                document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
                 setTimeout(() => {
                     document.getElementById('downloadPdfBtn').textContent = originalText;
                 }, 3000);
-            }, 'image/png', 1.0);
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                alert('Error generating PDF. Please try again.');
+            }
         }
 
         function downloadMIDI() {
@@ -1055,7 +1037,15 @@ Generated by I ♥ Music Notes Professional System
         // Initialize
         window.addEventListener('load', () => {
             console.log('I ♥ Music Notes - Professional System Loading...');
-            initializeAudio();
+            // Wait for jsPDF to load
+            setTimeout(() => {
+                if (typeof window.jspdf !== 'undefined') {
+                    console.log('jsPDF loaded successfully');
+                } else {
+                    console.error('jsPDF failed to load');
+                }
+                initializeAudio();
+            }, 1000);
         });
     </script>
 </body>

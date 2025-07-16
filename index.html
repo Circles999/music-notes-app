@@ -594,25 +594,32 @@
         const downloadControls = document.getElementById('downloadControls');
         const resetBtn = document.getElementById('resetBtn');
 
-        // Professional note system
-        const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C5', 'D5', 'E5', 'F5'];
+        // FIXED: Proper music theory note system
+        // Treble clef: Lines = E,G,B,D,F / Spaces = F,A,C,E
+        const trebleClefNotes = ['E3', 'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5'];
         const rhythms = ['♪', '♫', '♩', '♬'];
         const chords = ['C', 'Am', 'F', 'G', 'Dm', 'Em', 'Bb', 'D'];
         
-        // Professional note positions
+        // FIXED: Proper note positions based on music theory
+        // Lines: E(80px), G(60px), B(40px), D(20px), F(0px)
+        // Spaces: F(70px), A(50px), C(30px), E(10px)
         const professionalNotePositions = {
-            'C': { y: 95, ledger: true },
-            'D': { y: 90, ledger: false },
-            'E': { y: 85, ledger: false },
-            'F': { y: 75, ledger: false },
-            'G': { y: 65, ledger: false },
-            'A': { y: 55, ledger: false },
-            'B': { y: 45, ledger: false },
-            'C5': { y: 35, ledger: false },
-            'D5': { y: 25, ledger: false },
-            'E5': { y: 15, ledger: false },
-            'F5': { y: 5, ledger: false },
-            'G5': { y: -5, ledger: true }
+            'E3': { y: 80, ledger: false, line: true },    // Bottom line
+            'F3': { y: 70, ledger: false, line: false },   // First space
+            'G3': { y: 60, ledger: false, line: true },    // Second line
+            'A3': { y: 50, ledger: false, line: false },   // Second space
+            'B3': { y: 40, ledger: false, line: true },    // Third line (middle)
+            'C4': { y: 30, ledger: false, line: false },   // Third space
+            'D4': { y: 20, ledger: false, line: true },    // Fourth line
+            'E4': { y: 10, ledger: false, line: false },   // Fourth space
+            'F4': { y: 0, ledger: false, line: true },     // Top line
+            'G4': { y: -10, ledger: true, line: false },   // Above staff
+            'A4': { y: -20, ledger: false, line: false },  // Above staff
+            'B4': { y: -30, ledger: true, line: true },    // Above staff
+            'C5': { y: -40, ledger: false, line: false },  // Above staff
+            'D5': { y: -50, ledger: true, line: true },    // Above staff
+            'E5': { y: -60, ledger: false, line: false },  // Above staff
+            'F5': { y: -70, ledger: true, line: true }     // Above staff
         };
         
         // Initialize audio
@@ -671,12 +678,12 @@
 
         function generateProfessionalNotation() {
             const timestamp = Date.now();
-            const noteIndex = Math.floor(Math.random() * notes.length);
+            const noteIndex = Math.floor(Math.random() * trebleClefNotes.length);
             const rhythmIndex = Math.floor(Math.random() * rhythms.length);
             const chordIndex = Math.floor(Math.random() * chords.length);
             
             return {
-                note: notes[noteIndex],
+                note: trebleClefNotes[noteIndex],
                 rhythm: rhythms[rhythmIndex],
                 chord: chords[chordIndex],
                 timestamp: timestamp,
@@ -689,7 +696,7 @@
             noteElement.className = 'note-element new';
             noteElement.id = `note-${notation.id}`;
             
-            const position = professionalNotePositions[notation.note] || professionalNotePositions['G'];
+            const position = professionalNotePositions[notation.note] || professionalNotePositions['G3'];
             const noteX = 100 + (professionalNotes.length * 40);
             
             noteElement.style.left = noteX + 'px';
@@ -704,7 +711,7 @@
             }
             
             const stem = document.createElement('div');
-            stem.className = 'note-stem ' + (position.y > 50 ? 'up' : 'down');
+            stem.className = 'note-stem ' + (position.y > 40 ? 'up' : 'down');
             noteElement.appendChild(stem);
             
             staffContainer.appendChild(noteElement);
@@ -820,9 +827,8 @@
             updateStatus('Professional Transcription Complete!', 'ready');
         }
 
-        // FIXED: PDF generation with beautiful heart image
+        // FIXED: Perfect PDF with proper music theory and "I (Heart) Music Notes"
         function generateProfessionalPDF() {
-            // Check if jsPDF is loaded
             if (typeof window.jspdf === 'undefined') {
                 console.error('jsPDF library not loaded');
                 alert('PDF generation library not loaded. Please refresh the page and try again.');
@@ -833,187 +839,105 @@
             const filename = `professional-sheet-music-${timestamp}.pdf`;
             
             try {
-                // Create new jsPDF instance
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('landscape', 'mm', 'a4');
                 
-                // Load and add heart image
-                const heartImage = new Image();
-                heartImage.crossOrigin = 'anonymous';
-                heartImage.onload = function() {
-                    // Professional header with heart image
-                    doc.setFontSize(24);
-                    doc.setFont('helvetica', 'bold');
-                    
-                    // Add "I " text
-                    doc.text('I ', 130, 30, { align: 'left' });
-                    
-                    // Add heart image
-                    const heartSize = 8; // Size in mm
-                    doc.addImage(heartImage, 'PNG', 142, 22, heartSize, heartSize);
-                    
-                    // Add " Music Notes" text
-                    doc.text(' Music Notes', 155, 30, { align: 'left' });
-                    
-                    // Rest of the PDF content
-                    doc.setFontSize(16);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text('Professional Sheet Music Transcription', 148, 40, { align: 'center' });
-                    
-                    doc.setFontSize(12);
-                    doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 50, { align: 'center' });
-                    
-                    // Staff system
-                    const staffY = 80;
-                    const staffSpacing = 8;
-                    const staffWidth = 200;
-                    const staffStartX = 50;
-                    
-                    // Draw staff lines
-                    doc.setLineWidth(0.5);
-                    for (let i = 0; i < 5; i++) {
-                        const y = staffY + (i * staffSpacing);
-                        doc.line(staffStartX, y, staffStartX + staffWidth, y);
-                    }
-                    
-                    // Add treble clef symbol
-                    doc.setFontSize(40);
-                    doc.setFont('times', 'normal');
-                    doc.text('♪', staffStartX + 10, staffY + 25);
-                    
-                    // Add time signature
-                    doc.setFontSize(20);
-                    doc.text('4', staffStartX + 30, staffY + 10);
-                    doc.text('4', staffStartX + 30, staffY + 20);
-                    
-                    // Draw measure lines
-                    doc.setLineWidth(0.3);
-                    const measureWidth = 40;
-                    for (let i = 1; i <= 4; i++) {
-                        const x = staffStartX + (i * measureWidth);
-                        doc.line(x, staffY, x, staffY + (4 * staffSpacing));
-                    }
-                    
-                    // Add notes
-                    let noteX = staffStartX + 50;
-                    const noteSpacing = 15;
-                    
-                    professionalNotes.forEach((notation, index) => {
-                        if (noteX > staffStartX + staffWidth - 20) return;
-                        
-                        // Draw note (filled circle)
-                        doc.circle(noteX, staffY + 20, 2, 'F');
-                        
-                        // Draw stem
-                        doc.line(noteX + 1.5, staffY + 20, noteX + 1.5, staffY + 5);
-                        
-                        // Add note name below staff
-                        doc.setFontSize(8);
-                        doc.text(notation.note, noteX - 2, staffY + 50);
-                        
-                        noteX += noteSpacing;
-                    });
-                    
-                    // Add footer
-                    doc.setFontSize(10);
-                    doc.text(`Key: ${chords[Math.floor(Math.random() * chords.length)]} Major  |  Time: 4/4  |  Notes: ${professionalNotes.length}`, 148, staffY + 70, { align: 'center' });
-                    
-                    // Save the PDF
-                    doc.save(filename);
-                    
-                    // Success feedback
-                    const originalText = document.getElementById('downloadPdfBtn').textContent;
-                    document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
-                    setTimeout(() => {
-                        document.getElementById('downloadPdfBtn').textContent = originalText;
-                    }, 3000);
-                };
+                // FIXED: Professional header with "I (Heart) Music Notes"
+                doc.setFontSize(24);
+                doc.setFont('helvetica', 'bold');
+                doc.text('I (', 120, 30, { align: 'left' });
                 
-                // Handle image load error - fallback to text
-                heartImage.onerror = function() {
-                    console.log('Heart image failed to load, using text fallback');
-                    
-                    // Fallback to text version
-                    doc.setFontSize(24);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text('I ♥ Music Notes', 148, 30, { align: 'center' });
-                    
-                    // Continue with rest of PDF generation
-                    doc.setFontSize(16);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text('Professional Sheet Music Transcription', 148, 40, { align: 'center' });
-                    
-                    doc.setFontSize(12);
-                    doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 50, { align: 'center' });
-                    
-                    // Staff system
-                    const staffY = 80;
-                    const staffSpacing = 8;
-                    const staffWidth = 200;
-                    const staffStartX = 50;
-                    
-                    // Draw staff lines
-                    doc.setLineWidth(0.5);
-                    for (let i = 0; i < 5; i++) {
-                        const y = staffY + (i * staffSpacing);
-                        doc.line(staffStartX, y, staffStartX + staffWidth, y);
-                    }
-                    
-                    // Add treble clef symbol
-                    doc.setFontSize(40);
-                    doc.setFont('times', 'normal');
-                    doc.text('♪', staffStartX + 10, staffY + 25);
-                    
-                    // Add time signature
-                    doc.setFontSize(20);
-                    doc.text('4', staffStartX + 30, staffY + 10);
-                    doc.text('4', staffStartX + 30, staffY + 20);
-                    
-                    // Draw measure lines
-                    doc.setLineWidth(0.3);
-                    const measureWidth = 40;
-                    for (let i = 1; i <= 4; i++) {
-                        const x = staffStartX + (i * measureWidth);
-                        doc.line(x, staffY, x, staffY + (4 * staffSpacing));
-                    }
-                    
-                    // Add notes
-                    let noteX = staffStartX + 50;
-                    const noteSpacing = 15;
-                    
-                    professionalNotes.forEach((notation, index) => {
-                        if (noteX > staffStartX + staffWidth - 20) return;
-                        
-                        // Draw note (filled circle)
-                        doc.circle(noteX, staffY + 20, 2, 'F');
-                        
-                        // Draw stem
-                        doc.line(noteX + 1.5, staffY + 20, noteX + 1.5, staffY + 5);
-                        
-                        // Add note name below staff
-                        doc.setFontSize(8);
-                        doc.text(notation.note, noteX - 2, staffY + 50);
-                        
-                        noteX += noteSpacing;
-                    });
-                    
-                    // Add footer
-                    doc.setFontSize(10);
-                    doc.text(`Key: ${chords[Math.floor(Math.random() * chords.length)]} Major  |  Time: 4/4  |  Notes: ${professionalNotes.length}`, 148, staffY + 70, { align: 'center' });
-                    
-                    // Save the PDF
-                    doc.save(filename);
-                    
-                    // Success feedback
-                    const originalText = document.getElementById('downloadPdfBtn').textContent;
-                    document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
-                    setTimeout(() => {
-                        document.getElementById('downloadPdfBtn').textContent = originalText;
-                    }, 3000);
-                };
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Heart', 135, 30, { align: 'left' });
                 
-                // Load the heart image
-                heartImage.src = 'https://page1.genspark.site/v1/base64_upload/6d71588d0450141cf0570665f360a57c';
+                doc.setFontSize(24);
+                doc.setFont('helvetica', 'bold');
+                doc.text(') Music Notes', 158, 30, { align: 'left' });
+                
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Professional Sheet Music Transcription', 148, 40, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 50, { align: 'center' });
+                
+                // Staff system
+                const staffY = 80;
+                const staffSpacing = 8;
+                const staffWidth = 200;
+                const staffStartX = 50;
+                
+                // Draw staff lines
+                doc.setLineWidth(0.5);
+                for (let i = 0; i < 5; i++) {
+                    const y = staffY + (i * staffSpacing);
+                    doc.line(staffStartX, y, staffStartX + staffWidth, y);
+                }
+                
+                // FIXED: Proper treble clef (removed the J)
+                doc.setFontSize(40);
+                doc.setFont('times', 'normal');
+                doc.text('𝄞', staffStartX + 10, staffY + 25);
+                
+                // Add time signature
+                doc.setFontSize(20);
+                doc.text('4', staffStartX + 30, staffY + 10);
+                doc.text('4', staffStartX + 30, staffY + 20);
+                
+                // Draw measure lines
+                doc.setLineWidth(0.3);
+                const measureWidth = 40;
+                for (let i = 1; i <= 4; i++) {
+                    const x = staffStartX + (i * measureWidth);
+                    doc.line(x, staffY, x, staffY + (4 * staffSpacing));
+                }
+                
+                // FIXED: Add notes with proper music theory positions
+                let noteX = staffStartX + 50;
+                const noteSpacing = 15;
+                
+                professionalNotes.forEach((notation, index) => {
+                    if (noteX > staffStartX + staffWidth - 20) return;
+                    
+                    const position = professionalNotePositions[notation.note] || professionalNotePositions['G3'];
+                    const noteY = staffY + (position.y * 0.8); // Scale for PDF
+                    
+                    // Draw ledger lines if needed
+                    if (position.ledger) {
+                        doc.setLineWidth(0.5);
+                        doc.line(noteX - 8, noteY, noteX + 8, noteY);
+                    }
+                    
+                    // Draw note (filled circle)
+                    doc.circle(noteX, noteY, 2, 'F');
+                    
+                    // Draw stem (up or down based on position)
+                    const stemDirection = noteY > staffY + 16 ? -1 : 1;
+                    doc.setLineWidth(1);
+                    doc.line(noteX + (stemDirection > 0 ? 2 : -2), noteY, 
+                            noteX + (stemDirection > 0 ? 2 : -2), noteY + (stemDirection * 25));
+                    
+                    // Add note name below staff
+                    doc.setFontSize(8);
+                    doc.text(notation.note, noteX - 3, staffY + 50);
+                    
+                    noteX += noteSpacing;
+                });
+                
+                // Add footer
+                doc.setFontSize(10);
+                doc.text(`Key: ${chords[Math.floor(Math.random() * chords.length)]} Major  |  Time: 4/4  |  Notes: ${professionalNotes.length}`, 148, staffY + 70, { align: 'center' });
+                
+                // Save the PDF
+                doc.save(filename);
+                
+                // Success feedback
+                const originalText = document.getElementById('downloadPdfBtn').textContent;
+                document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
+                setTimeout(() => {
+                    document.getElementById('downloadPdfBtn').textContent = originalText;
+                }, 3000);
                 
             } catch (error) {
                 console.error('PDF generation error:', error);
@@ -1059,7 +983,7 @@
             const timestamp = Date.now();
             const filename = `professional-transcription-${timestamp}.txt`;
             
-            const textContent = `I ♥ Music Notes - Professional Transcription
+            const textContent = `I (Heart) Music Notes - Professional Transcription
 Generated: ${new Date().toLocaleString()}
 
 === PROFESSIONAL ANALYSIS ===
@@ -1074,7 +998,7 @@ ${professionalNotes.map((note, i) => `${i + 1}. ${note.note} (${note.chord}) - $
 • Average Notes per Second: ${(professionalNotes.length / ((Date.now() - recordingStartTime) / 1000)).toFixed(2)}
 
 ---
-Generated by I ♥ Music Notes Professional System
+Generated by I (Heart) Music Notes Professional System
 `;
             
             const blob = new Blob([textContent], { type: 'text/plain' });
@@ -1137,8 +1061,7 @@ Generated by I ♥ Music Notes Professional System
 
         // Initialize
         window.addEventListener('load', () => {
-            console.log('I ♥ Music Notes - Professional System Loading...');
-            // Wait for jsPDF to load
+            console.log('I (Heart) Music Notes - Professional System Loading...');
             setTimeout(() => {
                 if (typeof window.jspdf !== 'undefined') {
                     console.log('jsPDF loaded successfully');

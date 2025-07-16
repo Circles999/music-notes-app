@@ -594,29 +594,20 @@
         const downloadControls = document.getElementById('downloadControls');
         const resetBtn = document.getElementById('resetBtn');
 
-        // Professional note system based on music theory
-        const trebleClefNotes = ['E3', 'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5'];
+        // FIXED: Simpler note system that works
+        const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
         const rhythms = ['♪', '♫', '♩', '♬'];
         const chords = ['C', 'Am', 'F', 'G', 'Dm', 'Em', 'Bb', 'D'];
         
-        // Proper note positions based on music theory
-        const professionalNotePositions = {
-            'E3': { y: 80, ledger: false, line: true },
-            'F3': { y: 70, ledger: false, line: false },
-            'G3': { y: 60, ledger: false, line: true },
-            'A3': { y: 50, ledger: false, line: false },
-            'B3': { y: 40, ledger: false, line: true },
-            'C4': { y: 30, ledger: false, line: false },
-            'D4': { y: 20, ledger: false, line: true },
-            'E4': { y: 10, ledger: false, line: false },
-            'F4': { y: 0, ledger: false, line: true },
-            'G4': { y: -10, ledger: true, line: false },
-            'A4': { y: -20, ledger: false, line: false },
-            'B4': { y: -30, ledger: true, line: true },
-            'C5': { y: -40, ledger: false, line: false },
-            'D5': { y: -50, ledger: true, line: true },
-            'E5': { y: -60, ledger: false, line: false },
-            'F5': { y: -70, ledger: true, line: true }
+        // FIXED: Corrected note positions - properly positioned on staff
+        const notePositions = {
+            'C': { y: 95, ledger: true },   // Below staff
+            'D': { y: 85, ledger: false },  // Below bottom line
+            'E': { y: 80, ledger: false },  // On bottom line
+            'F': { y: 70, ledger: false },  // First space
+            'G': { y: 60, ledger: false },  // Second line
+            'A': { y: 50, ledger: false },  // Second space
+            'B': { y: 40, ledger: false }   // Third line
         };
         
         // Initialize audio
@@ -675,12 +666,12 @@
 
         function generateProfessionalNotation() {
             const timestamp = Date.now();
-            const noteIndex = Math.floor(Math.random() * trebleClefNotes.length);
+            const noteIndex = Math.floor(Math.random() * notes.length);
             const rhythmIndex = Math.floor(Math.random() * rhythms.length);
             const chordIndex = Math.floor(Math.random() * chords.length);
             
             return {
-                note: trebleClefNotes[noteIndex],
+                note: notes[noteIndex],
                 rhythm: rhythms[rhythmIndex],
                 chord: chords[chordIndex],
                 timestamp: timestamp,
@@ -693,12 +684,14 @@
             noteElement.className = 'note-element new';
             noteElement.id = `note-${notation.id}`;
             
-            const position = professionalNotePositions[notation.note] || professionalNotePositions['G3'];
+            const position = notePositions[notation.note];
             const noteX = 100 + (professionalNotes.length * 40);
             
+            // FIXED: Proper positioning
             noteElement.style.left = noteX + 'px';
             noteElement.style.top = position.y + 'px';
             
+            // Add ledger line if needed
             if (position.ledger) {
                 const ledgerLine = document.createElement('div');
                 ledgerLine.className = 'ledger-line';
@@ -707,6 +700,7 @@
                 staffContainer.appendChild(ledgerLine);
             }
             
+            // Add stem
             const stem = document.createElement('div');
             stem.className = 'note-stem ' + (position.y > 40 ? 'up' : 'down');
             noteElement.appendChild(stem);
@@ -824,130 +818,88 @@
             updateStatus('Professional Transcription Complete!', 'ready');
         }
 
-        // ENHANCED: Professional PDF generation inspired by classical sheet music
+        // FIXED: Simplified PDF generation that works
         function generateProfessionalPDF() {
-            if (typeof window.jspdf === 'undefined') {
-                console.error('jsPDF library not loaded');
-                alert('PDF generation library not loaded. Please refresh the page and try again.');
-                return;
-            }
-
+            console.log('PDF generation started');
+            
             const timestamp = Date.now();
             const filename = `professional-sheet-music-${timestamp}.pdf`;
             
             try {
+                // Check for jsPDF
+                if (typeof window.jspdf === 'undefined') {
+                    console.error('jsPDF not available');
+                    alert('PDF library not loaded. Please refresh and try again.');
+                    return;
+                }
+                
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('landscape', 'mm', 'a4');
                 
-                // Professional header with elegant typography
+                // Simple title
                 doc.setFontSize(20);
-                doc.setFont('helvetica', 'bold');
-                doc.text('I (', 125, 25, { align: 'left' });
+                doc.text('I (Heart) Music Notes', 148, 25, { align: 'center' });
                 
                 doc.setFontSize(14);
-                doc.setFont('helvetica', 'normal');
-                doc.text('Heart', 135, 25, { align: 'left' });
-                
-                doc.setFontSize(20);
-                doc.setFont('helvetica', 'bold');
-                doc.text(') Music Notes', 153, 25, { align: 'left' });
-                
-                doc.setFontSize(14);
-                doc.setFont('helvetica', 'normal');
-                doc.text('Professional Sheet Music Transcription', 148, 35, { align: 'center' });
+                doc.text('Professional Sheet Music', 148, 35, { align: 'center' });
                 
                 doc.setFontSize(10);
                 doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 45, { align: 'center' });
                 
-                // Enhanced staff system with better proportions
+                // Simple staff
                 const staffY = 70;
                 const staffSpacing = 6;
-                const staffWidth = 220;
-                const staffStartX = 40;
+                const staffWidth = 200;
+                const staffStartX = 50;
                 
-                // Draw staff lines with proper thickness
-                doc.setLineWidth(0.3);
+                // Draw staff lines
+                doc.setLineWidth(0.5);
                 for (let i = 0; i < 5; i++) {
                     const y = staffY + (i * staffSpacing);
                     doc.line(staffStartX, y, staffStartX + staffWidth, y);
                 }
                 
-                // Professional treble clef
-                doc.setFontSize(32);
-                doc.setFont('times', 'bold');
-                doc.text('𝄞', staffStartX + 8, staffY + 18);
+                // Treble clef
+                doc.setFontSize(30);
+                doc.text('♪', staffStartX + 10, staffY + 20);
                 
-                // Time signature with better positioning
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text('4', staffStartX + 25, staffY + 8);
-                doc.text('4', staffStartX + 25, staffY + 16);
-                
-                // Measure lines with professional spacing
-                doc.setLineWidth(0.5);
-                const measureWidth = 45;
-                for (let i = 1; i <= 4; i++) {
-                    const x = staffStartX + (i * measureWidth);
-                    doc.line(x, staffY, x, staffY + (4 * staffSpacing));
-                }
-                
-                // Professional notes with better spacing and positioning
+                // Notes
                 let noteX = staffStartX + 40;
-                const noteSpacing = 18;
-                
                 professionalNotes.forEach((notation, index) => {
-                    if (noteX > staffStartX + staffWidth - 25) return;
+                    if (noteX > staffStartX + staffWidth - 20) return;
                     
-                    const position = professionalNotePositions[notation.note] || professionalNotePositions['G3'];
-                    const noteY = staffY + (position.y * 0.3); // Better scaling for PDF
+                    const position = notePositions[notation.note];
+                    const noteY = staffY + (position.y * 0.25); // Scale for PDF
                     
-                    // Draw ledger lines for notes above/below staff
-                    if (position.ledger) {
-                        doc.setLineWidth(0.3);
-                        doc.line(noteX - 6, noteY, noteX + 6, noteY);
-                    }
+                    // Draw note
+                    doc.circle(noteX, noteY, 2, 'F');
                     
-                    // Draw professional note head (filled oval)
-                    doc.setFillColor(0, 0, 0);
-                    doc.ellipse(noteX, noteY, 1.5, 1, 0, 'F');
-                    
-                    // Draw stem with proper direction and length
+                    // Draw stem
                     const stemDirection = noteY > staffY + 12 ? -1 : 1;
-                    const stemLength = 20;
-                    doc.setLineWidth(0.8);
-                    doc.line(noteX + (stemDirection > 0 ? 1.5 : -1.5), noteY, 
-                            noteX + (stemDirection > 0 ? 1.5 : -1.5), noteY + (stemDirection * stemLength));
+                    doc.line(noteX + 2, noteY, noteX + 2, noteY + (stemDirection * 15));
                     
-                    // Add note name below staff (smaller and cleaner)
-                    doc.setFontSize(7);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text(notation.note, noteX - 2, staffY + 35);
-                    
-                    noteX += noteSpacing;
+                    noteX += 15;
                 });
                 
-                // Professional footer with better typography
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Key: ${chords[Math.floor(Math.random() * chords.length)]} Major  |  Time: 4/4  |  Notes: ${professionalNotes.length}`, 148, staffY + 50, { align: 'center' });
+                // Footer
+                doc.setFontSize(8);
+                doc.text(`Notes: ${professionalNotes.length}`, 148, staffY + 40, { align: 'center' });
                 
-                // Add subtle footer line
-                doc.setLineWidth(0.2);
-                doc.line(40, staffY + 60, 257, staffY + 60);
-                
-                // Save the PDF
+                // Save
                 doc.save(filename);
                 
-                // Success feedback
+                // Success message
                 const originalText = document.getElementById('downloadPdfBtn').textContent;
-                document.getElementById('downloadPdfBtn').textContent = '✅ Professional PDF Downloaded!';
+                document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
                 setTimeout(() => {
                     document.getElementById('downloadPdfBtn').textContent = originalText;
                 }, 3000);
                 
+                console.log('PDF generated successfully');
+                
             } catch (error) {
                 console.error('PDF generation error:', error);
-                alert('Error generating PDF. Please try again.');
+                alert('PDF generation failed. Error: ' + error.message);
             }
         }
 
@@ -1067,19 +1019,16 @@ Generated by I (Heart) Music Notes Professional System
 
         // Initialize
         window.addEventListener('load', () => {
-            console.log('I (Heart) Music Notes - Professional System Loading...');
+            console.log('I (Heart) Music Notes - Loading...');
             setTimeout(() => {
-                if (typeof window.jspdf !== 'undefined') {
-                    console.log('jsPDF loaded successfully');
-                } else {
-                    console.error('jsPDF failed to load');
-                }
+                console.log('jsPDF available:', typeof window.jspdf !== 'undefined');
                 initializeAudio();
             }, 1000);
         });
     </script>
 </body>
 </html>
+
 
 
 

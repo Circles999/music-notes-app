@@ -491,7 +491,7 @@
                 </div>
                 
                 <div class="sheet-music-container" id="sheetMusicContainer">
-                    <div style="text-align: center; color: #666; padding: 40px;">
+                    <div style="text-align: center; color: #666; padding: 40px;" id="placeholder">
                         <div style="font-size: 3em; margin-bottom: 20px;">🎼</div>
                         <div style="font-size: 1.2em; margin-bottom: 10px;">Professional sheet music will appear here</div>
                         <div style="font-size: 0.9em;">Start recording to see real-time notation with Unicode treble clef!</div>
@@ -517,6 +517,7 @@
                     </div>
                 </div>
                 
+                <!-- DOWNLOAD CONTROLS - Made sure they're properly included and visible -->
                 <div class="controls" id="downloadControls" style="display: none;">
                     <button class="btn btn-primary" id="downloadPdfBtn">📄 Download PDF</button>
                     <button class="btn btn-secondary" id="downloadMidiBtn">🎹 Download MIDI</button>
@@ -594,6 +595,7 @@
         const staffContainer = document.getElementById('staffContainer');
         const downloadControls = document.getElementById('downloadControls');
         const resetBtn = document.getElementById('resetBtn');
+        const placeholder = document.getElementById('placeholder');
 
         // Enhanced note system with proper musical intervals
         const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
@@ -766,7 +768,7 @@
             const existingNotes = staffContainer.querySelectorAll('.note-element, .ledger-line');
             existingNotes.forEach(note => note.remove());
             
-            sheetMusicContainer.querySelector('div').style.display = 'none';
+            placeholder.style.display = 'none';
             
             try {
                 mediaRecorder.start();
@@ -812,7 +814,11 @@
             liveNotation.textContent = currentTranscription;
             
             processingIndicator.classList.remove('active');
+            
+            // ENSURE DOWNLOAD BUTTONS SHOW UP
             downloadControls.style.display = 'flex';
+            console.log('Download controls displayed');
+            
             updateStatus('Professional Transcription Complete!', 'ready');
         }
 
@@ -1098,7 +1104,7 @@ Complete transcription of your recorded music
         function resetRecording() {
             liveNotation.style.display = 'none';
             professionalSheetMusic.style.display = 'none';
-            sheetMusicContainer.querySelector('div').style.display = 'block';
+            placeholder.style.display = 'block';
             liveNotation.innerHTML = '';
             
             const existingNotes = staffContainer.querySelectorAll('.note-element, .ledger-line');
@@ -1108,6 +1114,7 @@ Complete transcription of your recorded music
             professionalNotes = [];
             noteCounter = 0;
             
+            // Hide download controls
             downloadControls.style.display = 'none';
             processingIndicator.classList.remove('active');
             
@@ -1135,6 +1142,7 @@ Complete transcription of your recorded music
         // Initialize
         window.addEventListener('load', () => {
             console.log('I (Heart) Music Notes Professional - Loading...');
+            console.log('Download controls element:', document.getElementById('downloadControls'));
             setTimeout(() => {
                 console.log('jsPDF available:', typeof window.jspdf !== 'undefined');
                 console.log('MIDI generation: Fixed and working');
@@ -1145,6 +1153,7 @@ Complete transcription of your recorded music
     </script>
 </body>
 </html>
+
 
 
 

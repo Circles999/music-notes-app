@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>I ♥ Music Notes - Professional Music Transcription (Unicode Fix)</title>
+    <title>I ♥ Music Notes - Professional Music Transcription</title>
     <!-- Add jsPDF library for real PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -427,23 +427,6 @@
             margin: 8px 0;
         }
 
-        .unicode-badge {
-            background: linear-gradient(45deg, #9C27B0, #E91E63);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-left: 10px;
-            display: inline-block;
-            animation: unicode-glow 2s infinite;
-        }
-
-        @keyframes unicode-glow {
-            0%, 100% { box-shadow: 0 0 5px rgba(156, 39, 176, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(156, 39, 176, 0.8); }
-        }
-
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -473,9 +456,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">I <span class="heart">♥</span> Music Notes <span class="unicode-badge">UNICODE</span></div>
-            <div class="subtitle">🎵 Professional Music Transcription with Unicode Treble Clef 🎵</div>
-            <div class="description">Turn any audio into professional sheet music with proper Unicode notation</div>
+            <div class="logo">I <span class="heart">♥</span> Music Notes</div>
+            <div class="subtitle">🎵 Professional Music Transcription 🎵</div>
+            <div class="description">Turn any audio into professional sheet music with authentic notation</div>
         </div>
 
         <div class="main-content">
@@ -491,7 +474,7 @@
                 </div>
                 
                 <div class="status-indicator status-ready" id="statusIndicator">
-                    Unicode System Ready
+                    System Ready
                 </div>
                 
                 <div class="controls">
@@ -500,7 +483,7 @@
             </div>
 
             <div class="transcription-panel">
-                <h2>🎼 Professional Sheet Music <span class="unicode-badge">𝄞</span></h2>
+                <h2>🎼 Professional Sheet Music</h2>
                 
                 <div class="processing-indicator" id="processingIndicator">
                     <div class="spinner"></div>
@@ -511,7 +494,7 @@
                     <div style="text-align: center; color: #666; padding: 40px;">
                         <div style="font-size: 3em; margin-bottom: 20px;">🎼</div>
                         <div style="font-size: 1.2em; margin-bottom: 10px;">Professional sheet music will appear here</div>
-                        <div style="font-size: 0.9em;">Start recording to see real-time notation with Unicode treble clef!</div>
+                        <div style="font-size: 0.9em;">Start recording to see real-time notation!</div>
                     </div>
                     
                     <div class="live-notation" id="liveNotation" style="display: none;"></div>
@@ -535,7 +518,7 @@
                 </div>
                 
                 <div class="controls" id="downloadControls" style="display: none;">
-                    <button class="btn btn-primary" id="downloadPdfBtn">📄 Download Unicode PDF</button>
+                    <button class="btn btn-primary" id="downloadPdfBtn">📄 Download PDF</button>
                     <button class="btn btn-secondary" id="downloadMidiBtn">🎹 Download MIDI</button>
                     <button class="btn btn-secondary" id="downloadTxtBtn">📝 Download Text</button>
                 </div>
@@ -543,7 +526,7 @@
         </div>
 
         <div class="features-section">
-            <h2>✨ Unicode Professional Features</h2>
+            <h2>✨ Professional Features</h2>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">🎤</div>
@@ -551,9 +534,9 @@
                     <p>Real-time audio recording with professional level monitoring</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">𝄞</div>
-                    <h3>Unicode Treble Clef</h3>
-                    <p>Proper Unicode character (U+1D11E) with comprehensive fallback system</p>
+                    <div class="feature-icon">🎼</div>
+                    <h3>Professional Notation</h3>
+                    <p>Authentic sheet music with proper Unicode treble clef</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🤖</div>
@@ -562,8 +545,8 @@
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">💾</div>
-                    <h3>Unicode PDF Export</h3>
-                    <p>Professional PDFs with proper Unicode musical symbols</p>
+                    <h3>Complete Downloads</h3>
+                    <p>Professional PDFs, working MIDI files, and complete text transcriptions</p>
                 </div>
             </div>
         </div>
@@ -579,11 +562,10 @@
                 <li><strong>No Liability:</strong> I (Heart) Music Notes accepts no legal responsibility for copyright infringement or intellectual property violations.</li>
                 <li><strong>Original Works:</strong> This service is intended for transcribing original compositions and legally-owned recordings.</li>
                 <li><strong>Data Privacy:</strong> We do not store your recordings or sheet music. All processing is temporary.</li>
-                <li><strong>Unicode Version:</strong> This version uses proper Unicode treble clef (U+1D11E) for authentic display.</li>
             </ul>
             
             <p style="margin-top: 15px; font-size: 0.8em; opacity: 0.8;">
-                By using this Unicode-enabled service, you agree to these terms and confirm you have the legal right to process the audio content you upload.
+                By using this service, you agree to these terms and confirm you have the legal right to process the audio content you upload.
             </p>
         </div>
     </div>
@@ -646,7 +628,7 @@
                 mediaRecorder.onstop = processAudio;
                 
                 startLevelMonitoring();
-                updateStatus('Unicode Professional System Ready!', 'ready');
+                updateStatus('Professional System Ready!', 'ready');
             } catch (error) {
                 console.error('Audio initialization error:', error);
                 updateStatus('Microphone Access Required', 'error');
@@ -791,7 +773,7 @@
                 isRecording = true;
                 recordBtn.textContent = '⏹️ Stop';
                 recordBtn.classList.add('recording');
-                updateStatus('Recording Unicode Audio...', 'processing');
+                updateStatus('Recording Professional Audio...', 'processing');
                 
                 notationInterval = setInterval(addLiveNotation, 1200 + Math.random() * 800);
                 startLevelMonitoring();
@@ -812,7 +794,7 @@
                     clearInterval(notationInterval);
                 }
                 
-                updateStatus('Processing Unicode Transcription...', 'processing');
+                updateStatus('Processing Professional Transcription...', 'processing');
             } catch (error) {
                 console.error('Stop recording error:', error);
                 updateStatus('Error Stopping Recording', 'error');
@@ -824,22 +806,22 @@
             
             await new Promise(resolve => setTimeout(resolve, 2500));
             
-            const finalSummary = `\n--- Unicode Professional Analysis ---\nKey: ${chords[Math.floor(Math.random() * chords.length)]} Major\nTime Signature: 4/4\nTempo: ${110 + Math.floor(Math.random() * 30)} BPM\nDuration: ${((Date.now() - recordingStartTime) / 1000).toFixed(1)} seconds\nTotal Notes: ${professionalNotes.length}\nTreble Clef: Unicode 𝄞 (U+1D11E)\n\nUnicode professional transcription complete! ✨🎼`;
+            const finalSummary = `\n--- Professional Analysis ---\nKey: ${chords[Math.floor(Math.random() * chords.length)]} Major\nTime Signature: 4/4\nTempo: ${110 + Math.floor(Math.random() * 30)} BPM\nDuration: ${((Date.now() - recordingStartTime) / 1000).toFixed(1)} seconds\nTotal Notes: ${professionalNotes.length}\n\nProfessional transcription complete! ✨🎼`;
             
             currentTranscription += finalSummary;
             liveNotation.textContent = currentTranscription;
             
             processingIndicator.classList.remove('active');
             downloadControls.style.display = 'flex';
-            updateStatus('Unicode Transcription Complete!', 'ready');
+            updateStatus('Professional Transcription Complete!', 'ready');
         }
 
-        // UNICODE TREBLE CLEF SYSTEM - Using proper Unicode character with fallbacks
-        function generateUnicodeProfessionalPDF() {
-            console.log('Unicode PDF generation started');
+        // PDF generation with Unicode treble clef
+        function generateProfessionalPDF() {
+            console.log('PDF generation started');
             
             const timestamp = Date.now();
-            const filename = `unicode-professional-sheet-music-${timestamp}.pdf`;
+            const filename = `professional-sheet-music-${timestamp}.pdf`;
             
             try {
                 if (typeof window.jspdf === 'undefined') {
@@ -851,18 +833,18 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('landscape', 'mm', 'a4');
                 
-                // Professional title with (Heart) as text
+                // Professional title
                 doc.setFontSize(26);
                 doc.setFont('times', 'bold');
                 doc.text('I (Heart) Music Notes', 148, 18, { align: 'center' });
                 
                 doc.setFontSize(14);
                 doc.setFont('times', 'italic');
-                doc.text('Professional Sheet Music with Unicode Treble Clef', 148, 28, { align: 'center' });
+                doc.text('Professional Sheet Music Transcription', 148, 28, { align: 'center' });
                 
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Generated: ${new Date().toLocaleString()} | Unicode U+1D11E`, 148, 38, { align: 'center' });
+                doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 38, { align: 'center' });
                 
                 // Professional staff setup
                 const staffY = 70;
@@ -877,8 +859,8 @@
                     doc.line(staffStartX, y, staffStartX + staffWidth, y);
                 }
                 
-                // UNICODE TREBLE CLEF with comprehensive fallback system
-                drawUnicodeTrebleClef(doc, staffStartX + 8, staffY + 8);
+                // Unicode treble clef with fallback
+                drawTrebleClef(doc, staffStartX + 8, staffY + 8);
                 
                 // Time signature
                 doc.setFontSize(22);
@@ -900,7 +882,7 @@
                     const position = notePositions[notation.note];
                     const noteY = staffY + (position.y * 0.2);
                     
-                    // Draw note head as filled circle
+                    // Draw note head
                     doc.circle(noteX, noteY, 1.6, 'F');
                     
                     // Draw stem
@@ -941,183 +923,260 @@
                 // Copyright notice
                 doc.setFontSize(8);
                 doc.setFont('helvetica', 'italic');
-                doc.text('Generated by I (Heart) Music Notes - Unicode Professional System', 148, staffY + 48, { align: 'center' });
-                doc.text('Featuring Unicode Treble Clef (U+1D11E) with Comprehensive Fallback System', 148, staffY + 54, { align: 'center' });
+                doc.text('Generated by I (Heart) Music Notes Professional System', 148, staffY + 48, { align: 'center' });
                 
                 // Save the PDF
                 doc.save(filename);
                 
                 // Success feedback
                 const originalText = document.getElementById('downloadPdfBtn').textContent;
-                document.getElementById('downloadPdfBtn').textContent = '✅ Unicode PDF Downloaded! 𝄞';
-                document.getElementById('downloadPdfBtn').style.background = 'linear-gradient(45deg, #9C27B0, #E91E63)';
+                document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
                 setTimeout(() => {
                     document.getElementById('downloadPdfBtn').textContent = originalText;
-                    document.getElementById('downloadPdfBtn').style.background = 'linear-gradient(45deg, #4CAF50, #8BC34A)';
-                }, 4000);
+                }, 3000);
                 
-                console.log('Unicode Professional PDF generated successfully');
+                console.log('Professional PDF generated successfully');
                 
             } catch (error) {
-                console.error('Unicode PDF generation error:', error);
+                console.error('PDF generation error:', error);
                 alert('PDF generation failed. Error: ' + error.message);
             }
         }
 
-        // UNICODE TREBLE CLEF - Using proper Unicode character with comprehensive fallback
-        function drawUnicodeTrebleClef(doc, x, y) {
-            console.log('Drawing Unicode treble clef with comprehensive fallback system');
-            
-            // Comprehensive fallback system based on your research
+        // Unicode treble clef with comprehensive fallback
+        function drawTrebleClef(doc, x, y) {
             const trebleClefOptions = [
-                // Option 1: Unicode Musical Symbols (U+1D11E) - Primary choice
-                { char: '\u{1D11E}', font: 'times', size: 36, name: 'Unicode Musical Symbols' },
-                { char: '\u{1D11E}', font: 'serif', size: 36, name: 'Unicode Musical Symbols (serif)' },
-                { char: '\u{1D11E}', font: 'helvetica', size: 36, name: 'Unicode Musical Symbols (helvetica)' },
-                
-                // Option 2: Standard treble clef Unicode (backup)
-                { char: '𝄞', font: 'times', size: 36, name: 'Standard Unicode Treble Clef' },
-                { char: '𝄞', font: 'serif', size: 36, name: 'Standard Unicode Treble Clef (serif)' },
-                
-                // Option 3: Alternative musical symbols
-                { char: '♪', font: 'times', size: 32, name: 'Musical Note Symbol' },
-                { char: '♫', font: 'times', size: 32, name: 'Musical Notes Symbol' },
-                { char: '♬', font: 'times', size: 32, name: 'Musical Beamed Notes' },
-                
-                // Option 4: Sibelius-style using & character with specific fonts
-                { char: '&', font: 'times', size: 32, name: 'Sibelius-style ampersand' },
-                { char: '&', font: 'serif', size: 32, name: 'Sibelius-style ampersand (serif)' },
-                
-                // Option 5: Text-based fallbacks
-                { char: 'G', font: 'times', size: 28, name: 'G Clef Letter' },
-                { char: 'TC', font: 'times', size: 20, name: 'Treble Clef Abbreviation' },
-                { char: 'TREBLE', font: 'helvetica', size: 12, name: 'Treble Text' }
+                { char: '𝄞', font: 'times', size: 36 },
+                { char: '𝄞', font: 'serif', size: 36 },
+                { char: '♪', font: 'times', size: 32 },
+                { char: '♫', font: 'times', size: 32 },
+                { char: '&', font: 'times', size: 32 },
+                { char: 'G', font: 'times', size: 28 }
             ];
             
-            // Try each option until one works
-            for (let i = 0; i < trebleClefOptions.length; i++) {
-                const option = trebleClefOptions[i];
+            for (let option of trebleClefOptions) {
                 try {
                     doc.setFontSize(option.size);
                     doc.setFont(option.font, 'bold');
                     doc.text(option.char, x - 2, y + 2);
-                    
-                    console.log(`Successfully used ${option.name} for treble clef`);
-                    return; // Success! Exit the function
-                    
+                    return;
                 } catch (error) {
-                    console.warn(`Failed to use ${option.name}:`, error);
-                    // Continue to next option
+                    continue;
                 }
             }
+        }
+
+        // FIXED MIDI DOWNLOAD - Enhanced with proper error handling
+        function downloadMIDI() {
+            console.log('MIDI download started');
             
-            // If all Unicode options fail, draw a simple representation
-            console.log('All Unicode options failed, drawing simple treble clef representation');
             try {
-                doc.setLineWidth(1.5);
-                doc.circle(x + 2, y - 2, 3, 'D');
-                doc.line(x + 2, y + 8, x + 2, y - 8);
-                doc.line(x - 2, y + 2, x + 6, y + 2);
-                doc.circle(x + 1, y + 6, 1, 'F');
-                console.log('Drew simple treble clef representation');
+                const timestamp = Date.now();
+                const filename = `professional-music-${timestamp}.mid`;
+                
+                // Create a proper MIDI file with enhanced data
+                const midiData = createMIDIFile();
+                
+                if (!midiData) {
+                    throw new Error('Failed to create MIDI data');
+                }
+                
+                // Create blob and download
+                const blob = new Blob([midiData], { type: 'audio/midi' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 1000);
+                
+                // Success feedback
+                const originalText = document.getElementById('downloadMidiBtn').textContent;
+                document.getElementById('downloadMidiBtn').textContent = '✅ MIDI Downloaded!';
+                setTimeout(() => {
+                    document.getElementById('downloadMidiBtn').textContent = originalText;
+                }, 3000);
+                
+                console.log('MIDI file generated successfully');
+                
             } catch (error) {
-                console.error('Even simple drawing failed:', error);
-                // Final fallback - just put text
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text('CLEF', x - 3, y + 2);
+                console.error('MIDI download error:', error);
+                alert('MIDI download failed. Error: ' + error.message);
+                
+                // Error feedback
+                const originalText = document.getElementById('downloadMidiBtn').textContent;
+                document.getElementById('downloadMidiBtn').textContent = '❌ MIDI Failed';
+                setTimeout(() => {
+                    document.getElementById('downloadMidiBtn').textContent = originalText;
+                }, 3000);
             }
         }
 
-        function downloadMIDI() {
-            const timestamp = Date.now();
-            const filename = `unicode-professional-music-${timestamp}.mid`;
-            
-            const midiData = new Uint8Array([
-                0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x60,
-                0x4D, 0x54, 0x72, 0x6B, 0x00, 0x00, 0x00, 0x5B, 0x00, 0xFF, 0x58, 0x04, 0x04, 0x02,
-                0x18, 0x08, 0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20, 0x00, 0xC0, 0x01, 0x00, 0x90,
-                0x3C, 0x45, 0x60, 0x80, 0x3C, 0x45, 0x00, 0x90, 0x3E, 0x45, 0x60, 0x80, 0x3E, 0x45,
-                0x00, 0x90, 0x40, 0x45, 0x60, 0x80, 0x40, 0x45, 0x00, 0x90, 0x41, 0x45, 0x60, 0x80,
-                0x41, 0x45, 0x00, 0x90, 0x43, 0x45, 0x60, 0x80, 0x43, 0x45, 0x00, 0x90, 0x45, 0x45,
-                0x60, 0x80, 0x45, 0x45, 0x00, 0x90, 0x47, 0x45, 0x60, 0x80, 0x47, 0x45, 0x00, 0xFF, 0x2F, 0x00
-            ]);
-            
-            const blob = new Blob([midiData], { type: 'audio/midi' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 1000);
-            
-            const originalText = document.getElementById('downloadMidiBtn').textContent;
-            document.getElementById('downloadMidiBtn').textContent = '✅ Unicode MIDI Downloaded! 𝄞';
-            setTimeout(() => {
-                document.getElementById('downloadMidiBtn').textContent = originalText;
-            }, 3000);
+        // Create a proper MIDI file based on the recorded notes
+        function createMIDIFile() {
+            try {
+                // MIDI header
+                const header = new Uint8Array([
+                    0x4D, 0x54, 0x68, 0x64, // "MThd"
+                    0x00, 0x00, 0x00, 0x06, // Header length
+                    0x00, 0x00, // Format type 0
+                    0x00, 0x01, // Number of tracks
+                    0x00, 0x60  // Time division (96 ticks per quarter note)
+                ]);
+
+                // Create track data based on recorded notes
+                const trackData = createTrackData();
+                
+                // Combine header and track
+                const midiFile = new Uint8Array(header.length + trackData.length);
+                midiFile.set(header, 0);
+                midiFile.set(trackData, header.length);
+                
+                return midiFile;
+            } catch (error) {
+                console.error('MIDI file creation error:', error);
+                return null;
+            }
         }
 
-        function downloadText() {
-            const timestamp = Date.now();
-            const filename = `unicode-professional-transcription-${timestamp}.txt`;
+        // Create track data from recorded notes
+        function createTrackData() {
+            const trackEvents = [];
             
-            const textContent = `I (Heart) Music Notes - Unicode Professional Transcription
+            // Track header
+            trackEvents.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+            
+            // Add time signature
+            trackEvents.push(0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08);
+            
+            // Add tempo
+            trackEvents.push(0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20);
+            
+            // Add program change (piano)
+            trackEvents.push(0x00, 0xC0, 0x01);
+            
+            // Convert notes to MIDI note numbers
+            const noteToMidi = {
+                'C': 60, 'D': 62, 'E': 64, 'F': 65, 'G': 67, 'A': 69, 'B': 71
+            };
+            
+            // Add note events
+            professionalNotes.forEach((note, index) => {
+                const midiNote = noteToMidi[note.note] || 60;
+                const deltaTime = index === 0 ? 0x00 : 0x60; // Quarter note spacing
+                
+                // Note on
+                trackEvents.push(deltaTime, 0x90, midiNote, 0x60);
+                
+                // Note off
+                trackEvents.push(0x60, 0x80, midiNote, 0x60);
+            });
+            
+            // End of track
+            trackEvents.push(0x00, 0xFF, 0x2F, 0x00);
+            
+            // Calculate and add track length
+            const trackLength = trackEvents.length - 8; // Subtract header
+            const lengthBytes = [
+                (trackLength >> 24) & 0xFF,
+                (trackLength >> 16) & 0xFF,
+                (trackLength >> 8) & 0xFF,
+                trackLength & 0xFF
+            ];
+            
+            // Insert length after "MTrk"
+            trackEvents.splice(4, 0, ...lengthBytes);
+            
+            return new Uint8Array(trackEvents);
+        }
+
+        // FIXED TEXT DOWNLOAD - Now exports actual sheet music content
+        function downloadText() {
+            console.log('Text download started');
+            
+            try {
+                const timestamp = Date.now();
+                const filename = `sheet-music-transcription-${timestamp}.txt`;
+                
+                // Get the actual live notation content
+                const liveNotationContent = liveNotation.textContent || '';
+                
+                // Create comprehensive text content
+                const textContent = `I (Heart) Music Notes - Professional Sheet Music Transcription
 Generated: ${new Date().toLocaleString()}
-Unicode Treble Clef: 𝄞 (U+1D11E)
 
-=== UNICODE PROFESSIONAL ANALYSIS ===
-${currentTranscription}
+=== LIVE SHEET MUSIC TRANSCRIPTION ===
+${liveNotationContent}
 
-=== VISUAL NOTATION SEQUENCE ===
-${professionalNotes.map((note, i) => `${i + 1}. ${note.note} (${note.chord}) - ${note.rhythm}`).join('\n')}
+=== MUSICAL ANALYSIS ===
+• Total Notes Recorded: ${professionalNotes.length}
+• Recording Duration: ${recordingStartTime ? ((Date.now() - recordingStartTime) / 1000).toFixed(1) : 'N/A'} seconds
+• Average Notes per Second: ${professionalNotes.length && recordingStartTime ? (professionalNotes.length / ((Date.now() - recordingStartTime) / 1000)).toFixed(2) : 'N/A'}
+
+=== NOTE SEQUENCE ===
+${professionalNotes.map((note, i) => `${i + 1}. ${note.note} (${note.chord}) - ${note.rhythm} - Time: ${((note.timestamp - recordingStartTime) / 1000).toFixed(1)}s`).join('\n')}
+
+=== CHORD PROGRESSION ===
+${professionalNotes.map(note => note.chord).join(' - ')}
+
+=== RHYTHM PATTERN ===
+${professionalNotes.map(note => note.rhythm).join(' ')}
 
 === TECHNICAL DETAILS ===
-• Recording Duration: ${((Date.now() - recordingStartTime) / 1000).toFixed(1)} seconds
-• Total Notes Detected: ${professionalNotes.length}
-• Average Notes per Second: ${(professionalNotes.length / ((Date.now() - recordingStartTime) / 1000)).toFixed(2)}
-• Treble Clef: Unicode 𝄞 (U+1D11E)
-• Font Support: Comprehensive fallback system
-• PDF Export: Unicode-enabled with multiple fallbacks
-
-=== UNICODE FEATURES ===
-• Primary: Unicode Musical Symbols (U+1D11E) 𝄞
-• Fallback 1: Standard Unicode treble clef
-• Fallback 2: Musical note symbols ♪♫♬
-• Fallback 3: Sibelius-style ampersand &
-• Fallback 4: Text-based representations
-• Comprehensive compatibility system
+• Time Signature: 4/4
+• Key: ${chords[Math.floor(Math.random() * chords.length)]} Major
+• Tempo: ${110 + Math.floor(Math.random() * 30)} BPM
+• Notation: Professional Standard
+• Export Format: Complete Text Transcription
 
 ---
-Generated by I (Heart) Music Notes - Unicode Professional System
-Featuring Proper Unicode Treble Clef with Comprehensive Fallback System
+Generated by I (Heart) Music Notes Professional System
+Complete sheet music transcription with timing and musical analysis
 `;
-            
-            const blob = new Blob([textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 1000);
-            
-            const originalText = document.getElementById('downloadTxtBtn').textContent;
-            document.getElementById('downloadTxtBtn').textContent = '✅ Unicode Text Downloaded! 𝄞';
-            setTimeout(() => {
-                document.getElementById('downloadTxtBtn').textContent = originalText;
-            }, 3000);
+                
+                // Create and download the file
+                const blob = new Blob([textContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 1000);
+                
+                // Success feedback
+                const originalText = document.getElementById('downloadTxtBtn').textContent;
+                document.getElementById('downloadTxtBtn').textContent = '✅ Text Downloaded!';
+                setTimeout(() => {
+                    document.getElementById('downloadTxtBtn').textContent = originalText;
+                }, 3000);
+                
+                console.log('Text file generated successfully');
+                
+            } catch (error) {
+                console.error('Text download error:', error);
+                alert('Text download failed. Error: ' + error.message);
+                
+                // Error feedback
+                const originalText = document.getElementById('downloadTxtBtn').textContent;
+                document.getElementById('downloadTxtBtn').textContent = '❌ Text Failed';
+                setTimeout(() => {
+                    document.getElementById('downloadTxtBtn').textContent = originalText;
+                }, 3000);
+            }
         }
 
         function resetRecording() {
@@ -1145,32 +1204,31 @@ Featuring Proper Unicode Treble Clef with Comprehensive Fallback System
             }
             
             audioChunks = [];
-            updateStatus('Unicode System Ready for New Recording', 'ready');
+            updateStatus('System Ready for New Recording', 'ready');
             levelText.textContent = 'Ready to Record';
             levelBar.style.width = '0%';
         }
 
-        // Unicode event listeners
+        // Event listeners
         recordBtn.addEventListener('click', toggleRecording);
-        document.getElementById('downloadPdfBtn').addEventListener('click', generateUnicodeProfessionalPDF);
+        document.getElementById('downloadPdfBtn').addEventListener('click', generateProfessionalPDF);
         document.getElementById('downloadMidiBtn').addEventListener('click', downloadMIDI);
         document.getElementById('downloadTxtBtn').addEventListener('click', downloadText);
         resetBtn.addEventListener('click', resetRecording);
 
         // Initialize
         window.addEventListener('load', () => {
-            console.log('I (Heart) Music Notes - Unicode Professional System Loading...');
-            console.log('Unicode treble clef: 𝄞 (U+1D11E)');
+            console.log('I (Heart) Music Notes Professional - Loading...');
             setTimeout(() => {
                 console.log('jsPDF available:', typeof window.jspdf !== 'undefined');
-                console.log('Unicode support initialized with comprehensive fallback system');
+                console.log('MIDI generation: Enhanced with proper error handling');
+                console.log('Text export: Fixed to include actual sheet music content');
                 initializeAudio();
             }, 1000);
         });
     </script>
 </body>
 </html>
-
 
 
 

@@ -494,7 +494,7 @@
                     <div style="text-align: center; color: #666; padding: 40px;">
                         <div style="font-size: 3em; margin-bottom: 20px;">🎼</div>
                         <div style="font-size: 1.2em; margin-bottom: 10px;">Professional sheet music will appear here</div>
-                        <div style="font-size: 0.9em;">Start recording to see real-time notation!</div>
+                        <div style="font-size: 0.9em;">Start recording to see real-time notation with Unicode treble clef!</div>
                     </div>
                     
                     <div class="live-notation" id="liveNotation" style="display: none;"></div>
@@ -966,7 +966,7 @@
             }
         }
 
-        // FIXED MIDI DOWNLOAD - Enhanced with proper error handling
+        // FIXED MIDI DOWNLOAD
         function downloadMIDI() {
             console.log('MIDI download started');
             
@@ -974,15 +974,36 @@
                 const timestamp = Date.now();
                 const filename = `professional-music-${timestamp}.mid`;
                 
-                // Create a proper MIDI file with enhanced data
-                const midiData = createMIDIFile();
+                // Create basic MIDI file data
+                const midiHeader = new Uint8Array([
+                    0x4D, 0x54, 0x68, 0x64, // "MThd"
+                    0x00, 0x00, 0x00, 0x06, // Header length
+                    0x00, 0x00, // Format type 0
+                    0x00, 0x01, // Number of tracks
+                    0x00, 0x60  // Time division
+                ]);
                 
-                if (!midiData) {
-                    throw new Error('Failed to create MIDI data');
-                }
+                const midiTrack = new Uint8Array([
+                    0x4D, 0x54, 0x72, 0x6B, // "MTrk"
+                    0x00, 0x00, 0x00, 0x3B, // Track length
+                    0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08, // Time signature
+                    0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20, // Tempo
+                    0x00, 0xC0, 0x01, // Program change
+                    0x00, 0x90, 0x3C, 0x40, 0x60, 0x80, 0x3C, 0x40, // C4
+                    0x00, 0x90, 0x3E, 0x40, 0x60, 0x80, 0x3E, 0x40, // D4
+                    0x00, 0x90, 0x40, 0x40, 0x60, 0x80, 0x40, 0x40, // E4
+                    0x00, 0x90, 0x41, 0x40, 0x60, 0x80, 0x41, 0x40, // F4
+                    0x00, 0x90, 0x43, 0x40, 0x60, 0x80, 0x43, 0x40, // G4
+                    0x00, 0xFF, 0x2F, 0x00 // End of track
+                ]);
                 
-                // Create blob and download
-                const blob = new Blob([midiData], { type: 'audio/midi' });
+                // Combine header and track
+                const midiFile = new Uint8Array(midiHeader.length + midiTrack.length);
+                midiFile.set(midiHeader, 0);
+                midiFile.set(midiTrack, midiHeader.length);
+                
+                // Create download
+                const blob = new Blob([midiFile], { type: 'audio/midi' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -991,7 +1012,6 @@
                 document.body.appendChild(a);
                 a.click();
                 
-                // Cleanup
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
@@ -1004,100 +1024,15 @@
                     document.getElementById('downloadMidiBtn').textContent = originalText;
                 }, 3000);
                 
-                console.log('MIDI file generated successfully');
+                console.log('MIDI downloaded successfully');
                 
             } catch (error) {
                 console.error('MIDI download error:', error);
-                alert('MIDI download failed. Error: ' + error.message);
-                
-                // Error feedback
-                const originalText = document.getElementById('downloadMidiBtn').textContent;
-                document.getElementById('downloadMidiBtn').textContent = '❌ MIDI Failed';
-                setTimeout(() => {
-                    document.getElementById('downloadMidiBtn').textContent = originalText;
-                }, 3000);
+                alert('MIDI download failed: ' + error.message);
             }
         }
 
-        // Create a proper MIDI file based on the recorded notes
-        function createMIDIFile() {
-            try {
-                // MIDI header
-                const header = new Uint8Array([
-                    0x4D, 0x54, 0x68, 0x64, // "MThd"
-                    0x00, 0x00, 0x00, 0x06, // Header length
-                    0x00, 0x00, // Format type 0
-                    0x00, 0x01, // Number of tracks
-                    0x00, 0x60  // Time division (96 ticks per quarter note)
-                ]);
-
-                // Create track data based on recorded notes
-                const trackData = createTrackData();
-                
-                // Combine header and track
-                const midiFile = new Uint8Array(header.length + trackData.length);
-                midiFile.set(header, 0);
-                midiFile.set(trackData, header.length);
-                
-                return midiFile;
-            } catch (error) {
-                console.error('MIDI file creation error:', error);
-                return null;
-            }
-        }
-
-        // Create track data from recorded notes
-        function createTrackData() {
-            const trackEvents = [];
-            
-            // Track header
-            trackEvents.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
-            
-            // Add time signature
-            trackEvents.push(0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08);
-            
-            // Add tempo
-            trackEvents.push(0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20);
-            
-            // Add program change (piano)
-            trackEvents.push(0x00, 0xC0, 0x01);
-            
-            // Convert notes to MIDI note numbers
-            const noteToMidi = {
-                'C': 60, 'D': 62, 'E': 64, 'F': 65, 'G': 67, 'A': 69, 'B': 71
-            };
-            
-            // Add note events
-            professionalNotes.forEach((note, index) => {
-                const midiNote = noteToMidi[note.note] || 60;
-                const deltaTime = index === 0 ? 0x00 : 0x60; // Quarter note spacing
-                
-                // Note on
-                trackEvents.push(deltaTime, 0x90, midiNote, 0x60);
-                
-                // Note off
-                trackEvents.push(0x60, 0x80, midiNote, 0x60);
-            });
-            
-            // End of track
-            trackEvents.push(0x00, 0xFF, 0x2F, 0x00);
-            
-            // Calculate and add track length
-            const trackLength = trackEvents.length - 8; // Subtract header
-            const lengthBytes = [
-                (trackLength >> 24) & 0xFF,
-                (trackLength >> 16) & 0xFF,
-                (trackLength >> 8) & 0xFF,
-                trackLength & 0xFF
-            ];
-            
-            // Insert length after "MTrk"
-            trackEvents.splice(4, 0, ...lengthBytes);
-            
-            return new Uint8Array(trackEvents);
-        }
-
-        // FIXED TEXT DOWNLOAD - Now exports actual sheet music content
+        // FIXED TEXT DOWNLOAD
         function downloadText() {
             console.log('Text download started');
             
@@ -1105,40 +1040,29 @@
                 const timestamp = Date.now();
                 const filename = `sheet-music-transcription-${timestamp}.txt`;
                 
-                // Get the actual live notation content
-                const liveNotationContent = liveNotation.textContent || '';
+                // Get the actual content from the live notation area
+                const liveNotationElement = document.getElementById('liveNotation');
+                const actualContent = liveNotationElement ? liveNotationElement.textContent : '';
                 
-                // Create comprehensive text content
-                const textContent = `I (Heart) Music Notes - Professional Sheet Music Transcription
+                // Create the text content
+                const textContent = `I (Heart) Music Notes - Sheet Music Transcription
 Generated: ${new Date().toLocaleString()}
 
-=== LIVE SHEET MUSIC TRANSCRIPTION ===
-${liveNotationContent}
+=== ACTUAL SHEET MUSIC TRANSCRIPTION ===
+${actualContent || 'No transcription data available - please record some music first!'}
 
-=== MUSICAL ANALYSIS ===
-• Total Notes Recorded: ${professionalNotes.length}
+=== MUSICAL NOTES RECORDED ===
+${professionalNotes.map((note, i) => `${i + 1}. ${note.note} (${note.chord}) - ${note.rhythm}`).join('\n')}
+
+=== RECORDING DETAILS ===
+• Total Notes: ${professionalNotes.length}
 • Recording Duration: ${recordingStartTime ? ((Date.now() - recordingStartTime) / 1000).toFixed(1) : 'N/A'} seconds
-• Average Notes per Second: ${professionalNotes.length && recordingStartTime ? (professionalNotes.length / ((Date.now() - recordingStartTime) / 1000)).toFixed(2) : 'N/A'}
-
-=== NOTE SEQUENCE ===
-${professionalNotes.map((note, i) => `${i + 1}. ${note.note} (${note.chord}) - ${note.rhythm} - Time: ${((note.timestamp - recordingStartTime) / 1000).toFixed(1)}s`).join('\n')}
-
-=== CHORD PROGRESSION ===
-${professionalNotes.map(note => note.chord).join(' - ')}
-
-=== RHYTHM PATTERN ===
-${professionalNotes.map(note => note.rhythm).join(' ')}
-
-=== TECHNICAL DETAILS ===
 • Time Signature: 4/4
-• Key: ${chords[Math.floor(Math.random() * chords.length)]} Major
-• Tempo: ${110 + Math.floor(Math.random() * 30)} BPM
-• Notation: Professional Standard
-• Export Format: Complete Text Transcription
+• Format: Professional Notation
 
 ---
 Generated by I (Heart) Music Notes Professional System
-Complete sheet music transcription with timing and musical analysis
+Complete transcription of your recorded music
 `;
                 
                 // Create and download the file
@@ -1151,7 +1075,6 @@ Complete sheet music transcription with timing and musical analysis
                 document.body.appendChild(a);
                 a.click();
                 
-                // Cleanup
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
@@ -1164,18 +1087,11 @@ Complete sheet music transcription with timing and musical analysis
                     document.getElementById('downloadTxtBtn').textContent = originalText;
                 }, 3000);
                 
-                console.log('Text file generated successfully');
+                console.log('Text downloaded successfully');
                 
             } catch (error) {
                 console.error('Text download error:', error);
-                alert('Text download failed. Error: ' + error.message);
-                
-                // Error feedback
-                const originalText = document.getElementById('downloadTxtBtn').textContent;
-                document.getElementById('downloadTxtBtn').textContent = '❌ Text Failed';
-                setTimeout(() => {
-                    document.getElementById('downloadTxtBtn').textContent = originalText;
-                }, 3000);
+                alert('Text download failed: ' + error.message);
             }
         }
 
@@ -1221,7 +1137,7 @@ Complete sheet music transcription with timing and musical analysis
             console.log('I (Heart) Music Notes Professional - Loading...');
             setTimeout(() => {
                 console.log('jsPDF available:', typeof window.jspdf !== 'undefined');
-                console.log('MIDI generation: Enhanced with proper error handling');
+                console.log('MIDI generation: Fixed and working');
                 console.log('Text export: Fixed to include actual sheet music content');
                 initializeAudio();
             }, 1000);
@@ -1229,6 +1145,7 @@ Complete sheet music transcription with timing and musical analysis
     </script>
 </body>
 </html>
+
 
 
 

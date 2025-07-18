@@ -815,7 +815,7 @@
             updateStatus('Professional Transcription Complete!', 'ready');
         }
 
-        // PROFESSIONAL QUALITY: Enhanced PDF generation with proper musical symbols
+        // FIXED: Simplified PDF generation without problematic ellipse calls
         function generateProfessionalPDF() {
             console.log('PDF generation started');
             
@@ -847,19 +847,21 @@
                 
                 // Professional staff setup
                 const staffY = 70;
-                const staffSpacing = 4;      // Reduced spacing for professional look
-                const staffWidth = 180;      // Professional width
-                const staffStartX = 60;      // Professional left margin
+                const staffSpacing = 4;
+                const staffWidth = 180;
+                const staffStartX = 60;
                 
-                // Draw staff lines with proper thickness
+                // Draw staff lines
                 doc.setLineWidth(0.8);
                 for (let i = 0; i < 5; i++) {
                     const y = staffY + (i * staffSpacing);
                     doc.line(staffStartX, y, staffStartX + staffWidth, y);
                 }
                 
-                // PROFESSIONAL TREBLE CLEF using SVG-like drawing
-                drawProfessionalTrebleClef(doc, staffStartX + 5, staffY + 8);
+                // SIMPLIFIED TREBLE CLEF - using text approach that works
+                doc.setFontSize(36);
+                doc.setFont('times', 'bold');
+                doc.text('𝄞', staffStartX + 8, staffY + 12);
                 
                 // Professional time signature
                 doc.setFontSize(20);
@@ -873,19 +875,25 @@
                 
                 // Professional note rendering
                 let noteX = staffStartX + 50;
-                const noteSpacing = 12;  // Professional note spacing
+                const noteSpacing = 12;
                 
                 professionalNotes.forEach((notation, index) => {
                     if (noteX > staffStartX + staffWidth - 20) return;
                     
                     const position = notePositions[notation.note];
-                    const noteY = staffY + (position.y * 0.2);  // Adjusted scaling
+                    const noteY = staffY + (position.y * 0.2);
                     
-                    // Draw professional note head (filled ellipse)
-                    drawProfessionalNoteHead(doc, noteX, noteY);
+                    // Draw note head as filled circle
+                    doc.circle(noteX, noteY, 1.5, 'F');
                     
-                    // Draw professional stem
-                    drawProfessionalStem(doc, noteX, noteY, noteY > staffY + 8);
+                    // Draw stem
+                    doc.setLineWidth(0.8);
+                    const stemUp = noteY > staffY + 8;
+                    if (stemUp) {
+                        doc.line(noteX + 1.5, noteY, noteX + 1.5, noteY - 12);
+                    } else {
+                        doc.line(noteX - 1.5, noteY, noteX - 1.5, noteY + 12);
+                    }
                     
                     // Add ledger lines if needed
                     if (position.ledger) {
@@ -893,7 +901,7 @@
                         doc.line(noteX - 3, noteY, noteX + 3, noteY);
                     }
                     
-                    // Add note name below staff (optional)
+                    // Add note name below staff
                     doc.setFontSize(8);
                     doc.setFont('helvetica', 'normal');
                     doc.text(notation.note, noteX - 1, staffY + 25);
@@ -932,48 +940,6 @@
             } catch (error) {
                 console.error('PDF generation error:', error);
                 alert('PDF generation failed. Error: ' + error.message);
-            }
-        }
-
-        // PROFESSIONAL TREBLE CLEF DRAWING
-        function drawProfessionalTrebleClef(doc, x, y) {
-            doc.setLineWidth(1.5);
-            
-            // Main spiral body
-            doc.ellipse(x + 2, y + 2, 2, 4, 0, 'D');
-            
-            // Upper curl
-            doc.ellipse(x + 2, y - 2, 1.5, 2, 0, 'D');
-            
-            // Lower loop
-            doc.ellipse(x + 2, y + 6, 1.5, 2, 0, 'D');
-            
-            // Vertical line
-            doc.line(x + 4, y - 4, x + 4, y + 10);
-            
-            // Cross line at G line
-            doc.line(x, y + 4, x + 6, y + 4);
-            
-            // Add decorative curves for professional look
-            doc.setLineWidth(1);
-            doc.arc(x + 2, y, 1, 0, Math.PI/2);
-            doc.arc(x + 2, y + 8, 1, Math.PI, 1.5*Math.PI);
-        }
-
-        // PROFESSIONAL NOTE HEAD DRAWING
-        function drawProfessionalNoteHead(doc, x, y) {
-            doc.setLineWidth(0.5);
-            // Draw filled ellipse rotated slightly for professional look
-            doc.ellipse(x, y, 1.5, 1, -15, 'F');
-        }
-
-        // PROFESSIONAL STEM DRAWING
-        function drawProfessionalStem(doc, x, y, stemUp) {
-            doc.setLineWidth(0.8);
-            if (stemUp) {
-                doc.line(x + 1.5, y, x + 1.5, y - 12);
-            } else {
-                doc.line(x - 1.5, y, x - 1.5, y + 12);
             }
         }
 

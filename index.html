@@ -427,6 +427,34 @@
             margin: 8px 0;
         }
 
+        /* DOWNLOAD BUTTONS - Enhanced styling */
+        .download-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .download-section h3 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .download-controls {
+            display: none;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .download-controls.show {
+            display: flex;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -517,11 +545,14 @@
                     </div>
                 </div>
                 
-                <!-- DOWNLOAD CONTROLS - Made sure they're properly included and visible -->
-                <div class="controls" id="downloadControls" style="display: none;">
-                    <button class="btn btn-primary" id="downloadPdfBtn">📄 Download PDF</button>
-                    <button class="btn btn-secondary" id="downloadMidiBtn">🎹 Download MIDI</button>
-                    <button class="btn btn-secondary" id="downloadTxtBtn">📝 Download Text</button>
+                <!-- DOWNLOAD SECTION - Enhanced and guaranteed to show -->
+                <div class="download-section" id="downloadSection" style="display: none;">
+                    <h3>📥 Download Your Sheet Music</h3>
+                    <div class="download-controls" id="downloadControls">
+                        <button class="btn btn-primary" id="downloadPdfBtn">📄 Download PDF</button>
+                        <button class="btn btn-secondary" id="downloadMidiBtn">🎹 Download MIDI</button>
+                        <button class="btn btn-secondary" id="downloadTxtBtn">📝 Download Text</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -593,6 +624,7 @@
         const liveNotation = document.getElementById('liveNotation');
         const professionalSheetMusic = document.getElementById('professionalSheetMusic');
         const staffContainer = document.getElementById('staffContainer');
+        const downloadSection = document.getElementById('downloadSection');
         const downloadControls = document.getElementById('downloadControls');
         const resetBtn = document.getElementById('resetBtn');
         const placeholder = document.getElementById('placeholder');
@@ -770,6 +802,10 @@
             
             placeholder.style.display = 'none';
             
+            // Hide download section during recording
+            downloadSection.style.display = 'none';
+            downloadControls.classList.remove('show');
+            
             try {
                 mediaRecorder.start();
                 isRecording = true;
@@ -815,9 +851,18 @@
             
             processingIndicator.classList.remove('active');
             
-            // ENSURE DOWNLOAD BUTTONS SHOW UP
+            // GUARANTEED TO SHOW DOWNLOAD BUTTONS
+            console.log('Showing download buttons...');
+            downloadSection.style.display = 'block';
+            downloadControls.classList.add('show');
             downloadControls.style.display = 'flex';
-            console.log('Download controls displayed');
+            
+            // Double-check visibility
+            setTimeout(() => {
+                downloadSection.style.display = 'block';
+                downloadControls.style.display = 'flex';
+                console.log('Download buttons should be visible now!');
+            }, 100);
             
             updateStatus('Professional Transcription Complete!', 'ready');
         }
@@ -972,7 +1017,7 @@
             }
         }
 
-        // FIXED MIDI DOWNLOAD
+        // MIDI DOWNLOAD
         function downloadMIDI() {
             console.log('MIDI download started');
             
@@ -1038,7 +1083,7 @@
             }
         }
 
-        // FIXED TEXT DOWNLOAD
+        // TEXT DOWNLOAD
         function downloadText() {
             console.log('Text download started');
             
@@ -1115,7 +1160,8 @@ Complete transcription of your recorded music
             noteCounter = 0;
             
             // Hide download controls
-            downloadControls.style.display = 'none';
+            downloadSection.style.display = 'none';
+            downloadControls.classList.remove('show');
             processingIndicator.classList.remove('active');
             
             if (isRecording) {
@@ -1141,18 +1187,19 @@ Complete transcription of your recorded music
 
         // Initialize
         window.addEventListener('load', () => {
-            console.log('I (Heart) Music Notes Professional - Loading...');
+            console.log('I (Heart) Music Notes Professional - System Loading...');
+            console.log('Download section element:', document.getElementById('downloadSection'));
             console.log('Download controls element:', document.getElementById('downloadControls'));
             setTimeout(() => {
                 console.log('jsPDF available:', typeof window.jspdf !== 'undefined');
-                console.log('MIDI generation: Fixed and working');
-                console.log('Text export: Fixed to include actual sheet music content');
+                console.log('System ready! Record some music to see the download buttons.');
                 initializeAudio();
             }, 1000);
         });
     </script>
 </body>
 </html>
+
 
 
 

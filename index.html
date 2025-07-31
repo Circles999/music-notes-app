@@ -6,6 +6,8 @@
     <title>I ♥ Music Notes - Professional Music Transcription</title>
     <!-- Add jsPDF library for real PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- PayPal JavaScript SDK - LIVE Integration -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AZi7qT4yFe4LMZ1M3p9Z80UJrUvvt0N45IkpCW7woLJqoIENe42EoI4NK-TCD1AZ5kW_UKhYg6N_Ivjn&currency=USD"></script>
     <style>
         * {
             margin: 0;
@@ -65,6 +67,103 @@
             opacity: 0.8;
         }
 
+        /* USAGE COUNTER DISPLAY */
+        .usage-counter {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .usage-counter.warning {
+            border: 2px solid rgba(255, 193, 7, 0.5);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .usage-counter.expired {
+            border: 2px solid rgba(255, 107, 107, 0.5);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .usage-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .usage-subtext {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* PAYMENT SECTION */
+        .payment-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .payment-section.show {
+            display: block;
+        }
+
+        .payment-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+
+        .payment-description {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .paypal-button-container {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .payment-processing {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .payment-processing.active {
+            display: block;
+        }
+
+        .payment-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        .payment-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .payment-success.show {
+            display: block;
+        }
+
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -103,6 +202,12 @@
         .record-button.recording {
             animation: recording-pulse 1s infinite;
             background: linear-gradient(45deg, #ff4444, #ff6666);
+        }
+
+        .record-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         @keyframes recording-pulse {
@@ -350,6 +455,12 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .features-section {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -427,7 +538,6 @@
             margin: 8px 0;
         }
 
-        /* DOWNLOAD BUTTONS - Enhanced styling */
         .download-section {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -489,6 +599,32 @@
             <div class="description">Turn any audio into professional sheet music with authentic notation</div>
         </div>
 
+        <!-- USAGE COUNTER SECTION -->
+        <div class="usage-counter" id="usageCounter">
+            <div class="usage-text" id="usageText">You have 4 free transcriptions remaining this month</div>
+            <div class="usage-subtext" id="usageSubtext">Resets automatically on the 1st of each month</div>
+        </div>
+
+        <!-- PAYMENT SECTION -->
+        <div class="payment-section" id="paymentSection">
+            <div class="payment-title">💳 Continue with Payment</div>
+            <div class="payment-description">
+                You've used your 4 free transcriptions this month.<br>
+                Continue with professional transcription for just $0.99
+            </div>
+            
+            <div class="paypal-button-container" id="paypalButtonContainer"></div>
+            
+            <div class="payment-processing" id="paymentProcessing">
+                <div class="payment-spinner"></div>
+                <div>Processing your payment...</div>
+            </div>
+            
+            <div class="payment-success" id="paymentSuccess">
+                ✅ Payment successful! Your transcription will now proceed.
+            </div>
+        </div>
+
         <div class="main-content">
             <div class="recording-panel">
                 <h2>🎤 Record Your Music</h2>
@@ -545,7 +681,6 @@
                     </div>
                 </div>
                 
-                <!-- DOWNLOAD SECTION - Enhanced and guaranteed to show -->
                 <div class="download-section" id="downloadSection" style="display: none;">
                     <h3>📥 Download Your Sheet Music</h3>
                     <div class="download-controls" id="downloadControls">
@@ -580,6 +715,11 @@
                     <h3>Complete Downloads</h3>
                     <p>Professional PDFs, working MIDI files, and complete text transcriptions</p>
                 </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3>Freemium Model</h3>
+                    <p>4 free transcriptions per month, then $0.99 per additional use</p>
+                </div>
             </div>
         </div>
 
@@ -600,7 +740,6 @@
                 By using this service, you agree to these terms and confirm you have the legal right to process the audio content you upload.
             </p>
             
-            <!-- ADDED LINKS TO LEGAL PAGES -->
             <p style="margin-top: 15px;">
                 <a href="/privacy-policy/" style="color: #FFD700; text-decoration: underline;">Privacy Policy</a> | 
                 <a href="/terms/" style="color: #FFD700; text-decoration: underline;">Terms of Service</a>
@@ -609,6 +748,152 @@
     </div>
 
     <script>
+        // USAGE TRACKING SYSTEM
+        let usageData = {
+            count: 0,
+            month: new Date().getMonth(),
+            year: new Date().getFullYear()
+        };
+
+        let paymentAuthorized = false;
+        let currentTransactionId = null;
+
+        // Load usage data from localStorage
+        function loadUsageData() {
+            const saved = localStorage.getItem('musicNotesUsage');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+                
+                // Reset if it's a new month
+                if (data.month !== currentMonth || data.year !== currentYear) {
+                    usageData = {
+                        count: 0,
+                        month: currentMonth,
+                        year: currentYear
+                    };
+                    saveUsageData();
+                } else {
+                    usageData = data;
+                }
+            }
+            updateUsageDisplay();
+        }
+
+        function saveUsageData() {
+            localStorage.setItem('musicNotesUsage', JSON.stringify(usageData));
+        }
+
+        function updateUsageDisplay() {
+            const usageCounter = document.getElementById('usageCounter');
+            const usageText = document.getElementById('usageText');
+            const usageSubtext = document.getElementById('usageSubtext');
+            
+            const remainingFree = Math.max(0, 4 - usageData.count);
+            
+            if (remainingFree > 0) {
+                usageCounter.className = 'usage-counter';
+                if (remainingFree === 1) {
+                    usageCounter.className = 'usage-counter warning';
+                }
+                usageText.textContent = `You have ${remainingFree} free transcription${remainingFree === 1 ? '' : 's'} remaining this month`;
+                usageSubtext.textContent = 'Resets automatically on the 1st of each month';
+            } else {
+                usageCounter.className = 'usage-counter expired';
+                usageText.textContent = 'Free transcriptions used for this month';
+                usageSubtext.textContent = '$0.99 per additional transcription • Resets on the 1st';
+            }
+        }
+
+        function checkUsageBeforeRecording() {
+            const remainingFree = Math.max(0, 4 - usageData.count);
+            
+            if (remainingFree > 0 || paymentAuthorized) {
+                return true; // Allow recording
+            } else {
+                // Show payment section
+                document.getElementById('paymentSection').classList.add('show');
+                document.getElementById('recordBtn').disabled = true;
+                return false; // Block recording
+            }
+        }
+
+        function incrementUsage() {
+            if (!paymentAuthorized) {
+                usageData.count++;
+                saveUsageData();
+                updateUsageDisplay();
+            }
+            // Reset payment authorization for next use
+            paymentAuthorized = false;
+            currentTransactionId = null;
+        }
+
+        // PAYPAL INTEGRATION
+        function initializePayPal() {
+            if (typeof paypal === 'undefined') {
+                console.error('PayPal SDK not loaded');
+                return;
+            }
+
+            paypal.Buttons({
+                style: {
+                    color: 'blue',
+                    shape: 'pill',
+                    label: 'pay',
+                    height: 40
+                },
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '0.99',
+                                currency_code: 'USD'
+                            },
+                            description: 'Music Transcription - I Love Music Notes'
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    document.getElementById('paymentProcessing').classList.add('active');
+                    
+                    return actions.order.capture().then(function(details) {
+                        console.log('Payment successful:', details);
+                        
+                        // Store transaction details
+                        currentTransactionId = details.id;
+                        paymentAuthorized = true;
+                        
+                        // Hide payment section
+                        document.getElementById('paymentSection').classList.remove('show');
+                        document.getElementById('paymentProcessing').classList.remove('active');
+                        document.getElementById('paymentSuccess').classList.add('show');
+                        
+                        // Re-enable recording
+                        document.getElementById('recordBtn').disabled = false;
+                        
+                        // Hide success message after 3 seconds
+                        setTimeout(() => {
+                            document.getElementById('paymentSuccess').classList.remove('show');
+                        }, 3000);
+                        
+                        console.log('Payment completed by', details.payer.name.given_name);
+                    });
+                },
+                onError: function(err) {
+                    console.error('PayPal payment error:', err);
+                    document.getElementById('paymentProcessing').classList.remove('active');
+                    alert('Payment failed. Please try again.');
+                },
+                onCancel: function(data) {
+                    console.log('Payment cancelled by user');
+                    document.getElementById('paymentProcessing').classList.remove('active');
+                }
+            }).render('#paypalButtonContainer');
+        }
+
+        // ORIGINAL MUSIC APP CODE (with usage integration)
         let mediaRecorder;
         let audioChunks = [];
         let isRecording = false;
@@ -635,23 +920,20 @@
         const resetBtn = document.getElementById('resetBtn');
         const placeholder = document.getElementById('placeholder');
 
-        // Enhanced note system with proper musical intervals
         const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
         const rhythms = ['♪', '♫', '♩', '♬'];
         const chords = ['C', 'Am', 'F', 'G', 'Dm', 'Em', 'Bb', 'D'];
         
-        // Professional note positioning (treble clef)
         const notePositions = {
-            'C': { y: 95, ledger: true },   // C4 (middle C)
-            'D': { y: 85, ledger: false },  // D4
-            'E': { y: 80, ledger: false },  // E4 (1st line)
-            'F': { y: 70, ledger: false },  // F4 (1st space)
-            'G': { y: 60, ledger: false },  // G4 (2nd line)
-            'A': { y: 50, ledger: false },  // A4 (2nd space)
-            'B': { y: 40, ledger: false }   // B4 (3rd line)
+            'C': { y: 95, ledger: true },
+            'D': { y: 85, ledger: false },
+            'E': { y: 80, ledger: false },
+            'F': { y: 70, ledger: false },
+            'G': { y: 60, ledger: false },
+            'A': { y: 50, ledger: false },
+            'B': { y: 40, ledger: false }
         };
         
-        // Initialize audio
         async function initializeAudio() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -717,7 +999,7 @@
                 chord: chords[chordIndex],
                 timestamp: timestamp,
                 id: noteCounter++,
-                midiNote: 60 + noteIndex // MIDI note number (C4 = 60)
+                midiNote: 60 + noteIndex
             };
         }
 
@@ -786,6 +1068,12 @@
                 await initializeAudio();
             }
             
+            // Check usage before allowing recording
+            if (!checkUsageBeforeRecording()) {
+                updateStatus('Payment Required - See Above', 'error');
+                return;
+            }
+            
             if (!isRecording) {
                 startRecording();
             } else {
@@ -808,8 +1096,6 @@
             existingNotes.forEach(note => note.remove());
             
             placeholder.style.display = 'none';
-            
-            // Hide download section during recording
             downloadSection.style.display = 'none';
             downloadControls.classList.remove('show');
             
@@ -858,19 +1144,17 @@
             
             processingIndicator.classList.remove('active');
             
-            // GUARANTEED TO SHOW DOWNLOAD BUTTONS
-            console.log('Showing download buttons...');
             downloadSection.style.display = 'block';
             downloadControls.classList.add('show');
             downloadControls.style.display = 'flex';
             
+            // INCREMENT USAGE COUNT AFTER SUCCESSFUL TRANSCRIPTION
+            incrementUsage();
+            
             updateStatus('Professional Transcription Complete!', 'ready');
         }
 
-        // PDF generation with Unicode treble clef
         function generateProfessionalPDF() {
-            console.log('PDF generation started');
-            
             if (professionalNotes.length === 0) {
                 alert('Please record some music first before generating PDF!');
                 return;
@@ -889,7 +1173,6 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('landscape', 'mm', 'a4');
                 
-                // Professional title
                 doc.setFontSize(26);
                 doc.setFont('times', 'bold');
                 doc.text('I (Heart) Music Notes', 148, 18, { align: 'center' });
@@ -902,35 +1185,29 @@
                 doc.setFont('helvetica', 'normal');
                 doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 38, { align: 'center' });
                 
-                // Professional staff setup
                 const staffY = 70;
                 const staffSpacing = 4;
                 const staffWidth = 180;
                 const staffStartX = 60;
                 
-                // Draw staff lines
                 doc.setLineWidth(0.9);
                 for (let i = 0; i < 5; i++) {
                     const y = staffY + (i * staffSpacing);
                     doc.line(staffStartX, y, staffStartX + staffWidth, y);
                 }
                 
-                // Unicode treble clef
                 doc.setFontSize(36);
                 doc.setFont('times', 'bold');
                 doc.text('𝄞', staffStartX + 8, staffY + 8);
                 
-                // Time signature
                 doc.setFontSize(22);
                 doc.setFont('times', 'bold');
                 doc.text('4', staffStartX + 26, staffY + 2);
                 doc.text('4', staffStartX + 26, staffY + 14);
                 
-                // Barlines
                 doc.setLineWidth(1.2);
                 doc.line(staffStartX + 38, staffY - 2, staffStartX + 38, staffY + 18);
                 
-                // Professional note rendering
                 let noteX = staffStartX + 52;
                 const noteSpacing = 14;
                 
@@ -940,10 +1217,8 @@
                     const position = notePositions[notation.note];
                     const noteY = staffY + (position.y * 0.2);
                     
-                    // Draw note head
                     doc.circle(noteX, noteY, 1.6, 'F');
                     
-                    // Draw stem
                     doc.setLineWidth(1.0);
                     const stemUp = noteY > staffY + 8;
                     if (stemUp) {
@@ -952,13 +1227,11 @@
                         doc.line(noteX - 1.6, noteY, noteX - 1.6, noteY + 14);
                     }
                     
-                    // Add ledger lines if needed
                     if (position.ledger) {
                         doc.setLineWidth(1.0);
                         doc.line(noteX - 4, noteY, noteX + 4, noteY);
                     }
                     
-                    // Add note labels
                     doc.setFontSize(9);
                     doc.setFont('helvetica', 'bold');
                     doc.text(notation.note, noteX - 1.5, staffY + 28);
@@ -966,34 +1239,27 @@
                     noteX += noteSpacing;
                 });
                 
-                // End barlines
                 doc.setLineWidth(1.2);
                 doc.line(staffStartX + staffWidth - 12, staffY - 2, staffStartX + staffWidth - 12, staffY + 18);
                 doc.setLineWidth(3.5);
                 doc.line(staffStartX + staffWidth - 7, staffY - 2, staffStartX + staffWidth - 7, staffY + 18);
                 
-                // Professional footer
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
                 const analysisText = `${professionalNotes.length} notes • ${chords[Math.floor(Math.random() * chords.length)]} Major • 4/4 time • ♩= ${110 + Math.floor(Math.random() * 30)}`;
                 doc.text(analysisText, 148, staffY + 38, { align: 'center' });
                 
-                // Copyright notice
                 doc.setFontSize(8);
                 doc.setFont('helvetica', 'italic');
                 doc.text('Generated by I (Heart) Music Notes Professional System', 148, staffY + 48, { align: 'center' });
                 
-                // Save the PDF
                 doc.save(filename);
                 
-                // Success feedback
                 const originalText = document.getElementById('downloadPdfBtn').textContent;
                 document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
                 setTimeout(() => {
                     document.getElementById('downloadPdfBtn').textContent = originalText;
                 }, 3000);
-                
-                console.log('Professional PDF generated successfully');
                 
             } catch (error) {
                 console.error('PDF generation error:', error);
@@ -1001,10 +1267,7 @@
             }
         }
 
-        // FIXED MIDI DOWNLOAD - Now creates proper MIDI with recorded notes
         function downloadMIDI() {
-            console.log('MIDI download started');
-            
             if (professionalNotes.length === 0) {
                 alert('Please record some music first before generating MIDI!');
                 return;
@@ -1014,10 +1277,8 @@
                 const timestamp = Date.now();
                 const filename = `professional-music-${timestamp}.mid`;
                 
-                // Create MIDI file data with actual recorded notes
                 const midiData = createMIDIFromNotes(professionalNotes);
                 
-                // Create download
                 const blob = new Blob([midiData], { type: 'audio/midi' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -1032,14 +1293,11 @@
                     URL.revokeObjectURL(url);
                 }, 1000);
                 
-                // Success feedback
                 const originalText = document.getElementById('downloadMidiBtn').textContent;
                 document.getElementById('downloadMidiBtn').textContent = '✅ MIDI Downloaded!';
                 setTimeout(() => {
                     document.getElementById('downloadMidiBtn').textContent = originalText;
                 }, 3000);
-                
-                console.log('MIDI downloaded successfully with', professionalNotes.length, 'notes');
                 
             } catch (error) {
                 console.error('MIDI download error:', error);
@@ -1047,54 +1305,42 @@
             }
         }
 
-        // Helper function to create MIDI from recorded notes
         function createMIDIFromNotes(notes) {
-            // MIDI header
             const header = new Uint8Array([
-                0x4D, 0x54, 0x68, 0x64, // "MThd"
-                0x00, 0x00, 0x00, 0x06, // Header length
-                0x00, 0x00, // Format type 0
-                0x00, 0x01, // Number of tracks
-                0x00, 0x60  // Time division (96 ticks per quarter note)
+                0x4D, 0x54, 0x68, 0x64,
+                0x00, 0x00, 0x00, 0x06,
+                0x00, 0x00,
+                0x00, 0x01,
+                0x00, 0x60
             ]);
             
-            // Create track data with recorded notes
             const trackEvents = [];
             
-            // Time signature
             trackEvents.push([0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08]);
-            // Tempo (120 BPM)
             trackEvents.push([0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20]);
-            // Program change (Piano)
             trackEvents.push([0x00, 0xC0, 0x01]);
             
-            // Add note events from recorded data
             let deltaTime = 0;
             notes.forEach((note, index) => {
-                const midiNote = 60 + notes.indexOf(note.note); // C4 = 60
-                const duration = 60; // Quarter note duration
+                const midiNote = 60 + notes.indexOf(note.note);
+                const duration = 60;
                 
-                // Note on
                 trackEvents.push([deltaTime, 0x90, midiNote, 0x64]);
-                // Note off
                 trackEvents.push([duration, 0x80, midiNote, 0x64]);
                 
-                deltaTime = index === 0 ? 0 : 60; // Quarter note spacing
+                deltaTime = index === 0 ? 0 : 60;
             });
             
-            // End of track
             trackEvents.push([0x00, 0xFF, 0x2F, 0x00]);
             
-            // Convert events to bytes
             const trackBytes = [];
             trackEvents.forEach(event => {
                 event.forEach(byte => trackBytes.push(byte));
             });
             
-            // Track header
             const trackLength = trackBytes.length;
             const track = new Uint8Array([
-                0x4D, 0x54, 0x72, 0x6B, // "MTrk"
+                0x4D, 0x54, 0x72, 0x6B,
                 (trackLength >> 24) & 0xFF,
                 (trackLength >> 16) & 0xFF,
                 (trackLength >> 8) & 0xFF,
@@ -1102,7 +1348,6 @@
                 ...trackBytes
             ]);
             
-            // Combine header and track
             const midiFile = new Uint8Array(header.length + track.length);
             midiFile.set(header, 0);
             midiFile.set(track, header.length);
@@ -1110,10 +1355,7 @@
             return midiFile;
         }
 
-        // FIXED TEXT DOWNLOAD - Now includes all recorded data
         function downloadText() {
-            console.log('Text download started');
-            
             if (professionalNotes.length === 0) {
                 alert('Please record some music first before generating text file!');
                 return;
@@ -1123,7 +1365,6 @@
                 const timestamp = Date.now();
                 const filename = `sheet-music-transcription-${timestamp}.txt`;
                 
-                // Create comprehensive text content
                 const textContent = `I (Heart) Music Notes - Professional Sheet Music Transcription
 Generated: ${new Date().toLocaleString()}
 
@@ -1159,7 +1400,6 @@ Complete transcription and analysis of your recorded music performance
 File created: ${new Date().toLocaleString()}
 `;
                 
-                // Create and download the file
                 const blob = new Blob([textContent], { type: 'text/plain; charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -1174,14 +1414,11 @@ File created: ${new Date().toLocaleString()}
                     URL.revokeObjectURL(url);
                 }, 1000);
                 
-                // Success feedback
                 const originalText = document.getElementById('downloadTxtBtn').textContent;
                 document.getElementById('downloadTxtBtn').textContent = '✅ Text Downloaded!';
                 setTimeout(() => {
                     document.getElementById('downloadTxtBtn').textContent = originalText;
                 }, 3000);
-                
-                console.log('Text file downloaded successfully with complete analysis');
                 
             } catch (error) {
                 console.error('Text download error:', error);
@@ -1202,10 +1439,18 @@ File created: ${new Date().toLocaleString()}
             professionalNotes = [];
             noteCounter = 0;
             
-            // Hide download controls
             downloadSection.style.display = 'none';
             downloadControls.classList.remove('show');
             processingIndicator.classList.remove('active');
+            
+            // Hide payment section and reset payment state
+            document.getElementById('paymentSection').classList.remove('show');
+            document.getElementById('paymentSuccess').classList.remove('show');
+            paymentAuthorized = false;
+            currentTransactionId = null;
+            
+            // Re-enable recording button
+            recordBtn.disabled = false;
             
             if (isRecording) {
                 stopRecording();
@@ -1230,18 +1475,27 @@ File created: ${new Date().toLocaleString()}
 
         // Initialize
         window.addEventListener('load', () => {
-            console.log('I (Heart) Music Notes Professional - System Loading...');
+            console.log('I (Heart) Music Notes Professional - Loading with PayPal Integration...');
+            
+            // Load usage data
+            loadUsageData();
+            
+            // Initialize PayPal
             setTimeout(() => {
-                console.log('All download functions are now properly implemented!');
-                console.log('- PDF: Creates professional sheet music');
-                console.log('- MIDI: Generates playable MIDI files with recorded notes');
-                console.log('- Text: Comprehensive analysis and transcription');
-                initializeAudio();
+                initializePayPal();
+                console.log('PayPal integration initialized');
             }, 1000);
+            
+            // Initialize audio
+            setTimeout(() => {
+                initializeAudio();
+                console.log('All systems ready: Usage tracking, PayPal payments, and music transcription!');
+            }, 1500);
         });
     </script>
 </body>
 </html>
+
 
 
 

@@ -258,6 +258,7 @@
             color: black;
             position: relative;
             overflow-y: auto;
+            max-height: 600px;
         }
 
         .live-notation {
@@ -295,7 +296,7 @@
             border-radius: 8px;
             padding: 30px;
             margin: 15px 0;
-            min-height: 300px;
+            min-height: 500px;
             position: relative;
             overflow: visible;
         }
@@ -308,19 +309,26 @@
             color: #333;
         }
 
-        .staff-container {
+        /* MULTI-LINE STAFF SYSTEM */
+        .staff-system {
+            position: relative;
+            width: 100%;
+            min-height: 400px;
+        }
+
+        .staff-line-container {
             position: relative;
             height: 120px;
-            margin: 30px 0;
+            margin: 40px 0;
             width: 100%;
         }
 
         .staff-line {
             position: absolute;
-            width: 100%;
+            width: calc(100% - 100px);
             height: 2px;
             background: #000;
-            left: 0;
+            left: 80px;
         }
 
         .treble-clef {
@@ -665,18 +673,8 @@
                     
                     <div class="professional-sheet-music" id="professionalSheetMusic" style="display: none;">
                         <div class="sheet-title">Professional Sheet Music Generation</div>
-                        <div class="staff-container" id="staffContainer">
-                            <div class="treble-clef">𝄞</div>
-                            <div class="staff-line" style="top: 0px;"></div>
-                            <div class="staff-line" style="top: 20px;"></div>
-                            <div class="staff-line" style="top: 40px;"></div>
-                            <div class="staff-line" style="top: 60px;"></div>
-                            <div class="staff-line" style="top: 80px;"></div>
-                            <div class="measure-line" style="left: 80px;"></div>
-                            <div class="measure-line" style="left: 200px;"></div>
-                            <div class="measure-line" style="left: 320px;"></div>
-                            <div class="measure-line" style="left: 440px;"></div>
-                            <div class="measure-line" style="left: 560px;"></div>
+                        <div class="staff-system" id="staffSystem">
+                            <!-- Staff lines will be dynamically created here -->
                         </div>
                     </div>
                 </div>
@@ -893,7 +891,7 @@
             }).render('#paypalButtonContainer');
         }
 
-        // ORIGINAL MUSIC APP CODE (with usage integration)
+        // ENHANCED MULTI-LINE MUSIC APP CODE
         let mediaRecorder;
         let audioChunks = [];
         let isRecording = false;
@@ -905,6 +903,9 @@
         let recordingStartTime;
         let professionalNotes = [];
         let noteCounter = 0;
+        let currentStaffLine = 0;
+        let notesInCurrentStaff = 0;
+        const NOTES_PER_STAFF = 12; // Notes per staff line
 
         const recordBtn = document.getElementById('recordBtn');
         const levelBar = document.getElementById('levelBar');
@@ -914,7 +915,7 @@
         const sheetMusicContainer = document.getElementById('sheetMusicContainer');
         const liveNotation = document.getElementById('liveNotation');
         const professionalSheetMusic = document.getElementById('professionalSheetMusic');
-        const staffContainer = document.getElementById('staffContainer');
+        const staffSystem = document.getElementById('staffSystem');
         const downloadSection = document.getElementById('downloadSection');
         const downloadControls = document.getElementById('downloadControls');
         const resetBtn = document.getElementById('resetBtn');
@@ -933,7 +934,39 @@
             'A': { y: 50, ledger: false },
             'B': { y: 40, ledger: false }
         };
-        
+
+        // CREATE NEW STAFF LINE
+        function createNewStaffLine(staffIndex) {
+            const staffContainer = document.createElement('div');
+            staffContainer.className = 'staff-line-container';
+            staffContainer.id = `staff-${staffIndex}`;
+            
+            // Create 5 staff lines
+            for (let i = 0; i < 5; i++) {
+                const line = document.createElement('div');
+                line.className = 'staff-line';
+                line.style.top = (i * 20) + 'px';
+                staffContainer.appendChild(line);
+            }
+            
+            // Add treble clef
+            const clef = document.createElement('div');
+            clef.className = 'treble-clef';
+            clef.textContent = '𝄞';
+            staffContainer.appendChild(clef);
+            
+            // Add measure lines
+            for (let i = 0; i < 6; i++) {
+                const measureLine = document.createElement('div');
+                measureLine.className = 'measure-line';
+                measureLine.style.left = (80 + i * 120) + 'px';
+                staffContainer.appendChild(measureLine);
+            }
+            
+            staffSystem.appendChild(staffContainer);
+            return staffContainer;
+        }
+
         async function initializeAudio() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -999,35 +1032,59 @@
                 chord: chords[chordIndex],
                 timestamp: timestamp,
                 id: noteCounter++,
-                midiNote: 60 + noteIndex
+                midiNote: 60 + noteIndex,
+                staffLine: currentStaffLine,
+                positionInStaff: notesInCurrentStaff
             };
         }
 
         function addProfessionalNote(notation) {
+            // Check if we need a new staff line
+            if (notesInCurrentStaff >= NOTES_PER_STAFF) {
+                currentStaffLine++;
+                notesInCurrentStaff = 0;
+                createNewStaffLine(currentStaffLine);
+            }
+            
+            // Get current staff container
+            let staffContainer = document.getElementById(`staff-${currentStaffLine}`);
+            if (!staffContainer) {
+                staffContainer = createNewStaffLine(currentStaffLine);
+            }
+            
+            // Create note element
             const noteElement = document.createElement('div');
             noteElement.className = 'note-element new';
             noteElement.id = `note-${notation.id}`;
             
+            // Calculate position
             const position = notePositions[notation.note];
-            const noteX = 100 + (professionalNotes.length * 40);
+            const noteX = 100 + (notesInCurrentStaff * 45); // Better spacing
+            const noteY = position.y;
             
             noteElement.style.left = noteX + 'px';
-            noteElement.style.top = position.y + 'px';
+            noteElement.style.top = noteY + 'px';
             
+            // Add ledger line if needed
             if (position.ledger) {
                 const ledgerLine = document.createElement('div');
                 ledgerLine.className = 'ledger-line';
                 ledgerLine.style.left = (noteX - 7) + 'px';
-                ledgerLine.style.top = position.y + 'px';
+                ledgerLine.style.top = noteY + 'px';
                 staffContainer.appendChild(ledgerLine);
             }
             
+            // Add note stem
             const stem = document.createElement('div');
             stem.className = 'note-stem ' + (position.y > 40 ? 'up' : 'down');
             noteElement.appendChild(stem);
             
             staffContainer.appendChild(noteElement);
             
+            // Increment position counters
+            notesInCurrentStaff++;
+            
+            // Animation
             setTimeout(() => {
                 noteElement.classList.remove('new');
             }, 500);
@@ -1086,14 +1143,19 @@
             currentTranscription = '';
             professionalNotes = [];
             noteCounter = 0;
+            currentStaffLine = 0;
+            notesInCurrentStaff = 0;
             recordingStartTime = Date.now();
+            
+            // Clear previous staff lines
+            staffSystem.innerHTML = '';
+            
+            // Create first staff line
+            createNewStaffLine(0);
             
             liveNotation.style.display = 'block';
             professionalSheetMusic.style.display = 'block';
             liveNotation.innerHTML = '';
-            
-            const existingNotes = staffContainer.querySelectorAll('.note-element, .ledger-line');
-            existingNotes.forEach(note => note.remove());
             
             placeholder.style.display = 'none';
             downloadSection.style.display = 'none';
@@ -1106,7 +1168,7 @@
                 recordBtn.classList.add('recording');
                 updateStatus('Recording Professional Audio...', 'processing');
                 
-                notationInterval = setInterval(addLiveNotation, 1200 + Math.random() * 800);
+                notationInterval = setInterval(addLiveNotation, 800 + Math.random() * 400); // More frequent notes
                 startLevelMonitoring();
             } catch (error) {
                 console.error('Recording error:', error);
@@ -1137,7 +1199,7 @@
             
             await new Promise(resolve => setTimeout(resolve, 2500));
             
-            const finalSummary = `\n--- Professional Analysis ---\nKey: ${chords[Math.floor(Math.random() * chords.length)]} Major\nTime Signature: 4/4\nTempo: ${110 + Math.floor(Math.random() * 30)} BPM\nDuration: ${((Date.now() - recordingStartTime) / 1000).toFixed(1)} seconds\nTotal Notes: ${professionalNotes.length}\n\nProfessional transcription complete! ✨🎼`;
+            const finalSummary = `\n--- Professional Analysis ---\nKey: ${chords[Math.floor(Math.random() * chords.length)]} Major\nTime Signature: 4/4\nTempo: ${110 + Math.floor(Math.random() * 30)} BPM\nDuration: ${((Date.now() - recordingStartTime) / 1000).toFixed(1)} seconds\nTotal Notes: ${professionalNotes.length}\nStaff Lines: ${currentStaffLine + 1}\n\nProfessional transcription complete! ✨🎼`;
             
             currentTranscription += finalSummary;
             liveNotation.textContent = currentTranscription;
@@ -1154,6 +1216,7 @@
             updateStatus('Professional Transcription Complete!', 'ready');
         }
 
+        // ENHANCED PDF GENERATION WITH MULTI-PAGE SUPPORT
         function generateProfessionalPDF() {
             if (professionalNotes.length === 0) {
                 alert('Please record some music first before generating PDF!');
@@ -1173,93 +1236,146 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('landscape', 'mm', 'a4');
                 
-                doc.setFontSize(26);
-                doc.setFont('times', 'bold');
-                doc.text('I (Heart) Music Notes', 148, 18, { align: 'center' });
+                let currentPage = 1;
+                let currentY = 70;
+                const staffHeight = 50;
+                const maxStaffPerPage = 4;
+                let staffsOnCurrentPage = 0;
                 
-                doc.setFontSize(14);
-                doc.setFont('times', 'italic');
-                doc.text('Professional Sheet Music Transcription', 148, 28, { align: 'center' });
-                
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Generated: ${new Date().toLocaleString()}`, 148, 38, { align: 'center' });
-                
-                const staffY = 70;
-                const staffSpacing = 4;
-                const staffWidth = 180;
-                const staffStartX = 60;
-                
-                doc.setLineWidth(0.9);
-                for (let i = 0; i < 5; i++) {
-                    const y = staffY + (i * staffSpacing);
-                    doc.line(staffStartX, y, staffStartX + staffWidth, y);
+                // Add title to first page
+                function addPageHeader(pageNum) {
+                    doc.setFontSize(26);
+                    doc.setFont('times', 'bold');
+                    doc.text('I (Heart) Music Notes', 148, 18, { align: 'center' });
+                    
+                    doc.setFontSize(14);
+                    doc.setFont('times', 'italic');
+                    doc.text('Professional Sheet Music Transcription', 148, 28, { align: 'center' });
+                    
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(`Generated: ${new Date().toLocaleString()} - Page ${pageNum}`, 148, 38, { align: 'center' });
                 }
                 
-                doc.setFontSize(36);
-                doc.setFont('times', 'bold');
-                doc.text('𝄞', staffStartX + 8, staffY + 8);
+                addPageHeader(1);
                 
-                doc.setFontSize(22);
-                doc.setFont('times', 'bold');
-                doc.text('4', staffStartX + 26, staffY + 2);
-                doc.text('4', staffStartX + 26, staffY + 14);
-                
-                doc.setLineWidth(1.2);
-                doc.line(staffStartX + 38, staffY - 2, staffStartX + 38, staffY + 18);
-                
-                let noteX = staffStartX + 52;
-                const noteSpacing = 14;
-                
-                professionalNotes.forEach((notation, index) => {
-                    if (noteX > staffStartX + staffWidth - 25) return;
-                    
-                    const position = notePositions[notation.note];
-                    const noteY = staffY + (position.y * 0.2);
-                    
-                    doc.circle(noteX, noteY, 1.6, 'F');
-                    
-                    doc.setLineWidth(1.0);
-                    const stemUp = noteY > staffY + 8;
-                    if (stemUp) {
-                        doc.line(noteX + 1.6, noteY, noteX + 1.6, noteY - 14);
-                    } else {
-                        doc.line(noteX - 1.6, noteY, noteX - 1.6, noteY + 14);
+                // Group notes by staff lines
+                const staffLines = {};
+                professionalNotes.forEach(note => {
+                    if (!staffLines[note.staffLine]) {
+                        staffLines[note.staffLine] = [];
                     }
-                    
-                    if (position.ledger) {
-                        doc.setLineWidth(1.0);
-                        doc.line(noteX - 4, noteY, noteX + 4, noteY);
-                    }
-                    
-                    doc.setFontSize(9);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text(notation.note, noteX - 1.5, staffY + 28);
-                    
-                    noteX += noteSpacing;
+                    staffLines[note.staffLine].push(note);
                 });
                 
-                doc.setLineWidth(1.2);
-                doc.line(staffStartX + staffWidth - 12, staffY - 2, staffStartX + staffWidth - 12, staffY + 18);
-                doc.setLineWidth(3.5);
-                doc.line(staffStartX + staffWidth - 7, staffY - 2, staffStartX + staffWidth - 7, staffY + 18);
+                // Draw each staff line
+                Object.keys(staffLines).forEach((staffIndex, index) => {
+                    // Check if we need a new page
+                    if (staffsOnCurrentPage >= maxStaffPerPage) {
+                        doc.addPage();
+                        currentPage++;
+                        addPageHeader(currentPage);
+                        currentY = 70;
+                        staffsOnCurrentPage = 0;
+                    }
+                    
+                    const staffY = currentY;
+                    const staffSpacing = 4;
+                    const staffWidth = 200;
+                    const staffStartX = 40;
+                    
+                    // Draw 5 staff lines
+                    doc.setLineWidth(0.9);
+                    for (let i = 0; i < 5; i++) {
+                        const y = staffY + (i * staffSpacing);
+                        doc.line(staffStartX, y, staffStartX + staffWidth, y);
+                    }
+                    
+                    // Add treble clef
+                    doc.setFontSize(36);
+                    doc.setFont('times', 'bold');
+                    doc.text('𝄞', staffStartX + 8, staffY + 8);
+                    
+                    // Add time signature (only on first staff)
+                    if (index === 0) {
+                        doc.setFontSize(22);
+                        doc.setFont('times', 'bold');
+                        doc.text('4', staffStartX + 26, staffY + 2);
+                        doc.text('4', staffStartX + 26, staffY + 14);
+                    }
+                    
+                    // Barlines
+                    doc.setLineWidth(1.2);
+                    doc.line(staffStartX + 38, staffY - 2, staffStartX + 38, staffY + 18);
+                    
+                    // Add notes for this staff
+                    const notesInStaff = staffLines[staffIndex];
+                    let noteX = staffStartX + 52;
+                    const noteSpacing = 12;
+                    
+                    notesInStaff.forEach((notation, noteIndex) => {
+                        if (noteX > staffStartX + staffWidth - 25) return;
+                        
+                        const position = notePositions[notation.note];
+                        const noteY = staffY + (position.y * 0.2);
+                        
+                        // Draw note head
+                        doc.circle(noteX, noteY, 1.6, 'F');
+                        
+                        // Draw stem
+                        doc.setLineWidth(1.0);
+                        const stemUp = noteY > staffY + 8;
+                        if (stemUp) {
+                            doc.line(noteX + 1.6, noteY, noteX + 1.6, noteY - 14);
+                        } else {
+                            doc.line(noteX - 1.6, noteY, noteX - 1.6, noteY + 14);
+                        }
+                        
+                        // Add ledger lines if needed
+                        if (position.ledger) {
+                            doc.setLineWidth(1.0);
+                            doc.line(noteX - 4, noteY, noteX + 4, noteY);
+                        }
+                        
+                        // Add note labels below staff
+                        doc.setFontSize(8);
+                        doc.setFont('helvetica', 'normal');
+                        doc.text(notation.note, noteX - 1.5, staffY + 28);
+                        
+                        noteX += noteSpacing;
+                    });
+                    
+                    // End barlines
+                    doc.setLineWidth(1.2);
+                    doc.line(staffStartX + staffWidth - 12, staffY - 2, staffStartX + staffWidth - 12, staffY + 18);
+                    doc.setLineWidth(3.5);
+                    doc.line(staffStartX + staffWidth - 7, staffY - 2, staffStartX + staffWidth - 7, staffY + 18);
+                    
+                    currentY += staffHeight;
+                    staffsOnCurrentPage++;
+                });
                 
+                // Footer on last page
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
-                const analysisText = `${professionalNotes.length} notes • ${chords[Math.floor(Math.random() * chords.length)]} Major • 4/4 time • ♩= ${110 + Math.floor(Math.random() * 30)}`;
-                doc.text(analysisText, 148, staffY + 38, { align: 'center' });
+                const analysisText = `${professionalNotes.length} notes • ${Object.keys(staffLines).length} staff lines • ${chords[Math.floor(Math.random() * chords.length)]} Major • 4/4 time`;
+                doc.text(analysisText, 148, currentY + 20, { align: 'center' });
                 
                 doc.setFontSize(8);
                 doc.setFont('helvetica', 'italic');
-                doc.text('Generated by I (Heart) Music Notes Professional System', 148, staffY + 48, { align: 'center' });
+                doc.text('Generated by I (Heart) Music Notes Professional System', 148, currentY + 30, { align: 'center' });
                 
+                // Save the PDF
                 doc.save(filename);
                 
+                // Success feedback
                 const originalText = document.getElementById('downloadPdfBtn').textContent;
                 document.getElementById('downloadPdfBtn').textContent = '✅ PDF Downloaded!';
                 setTimeout(() => {
                     document.getElementById('downloadPdfBtn').textContent = originalText;
                 }, 3000);
+                
+                console.log(`Professional multi-page PDF generated with ${Object.keys(staffLines).length} staff lines`);
                 
             } catch (error) {
                 console.error('PDF generation error:', error);
@@ -1328,7 +1444,7 @@
                 trackEvents.push([deltaTime, 0x90, midiNote, 0x64]);
                 trackEvents.push([duration, 0x80, midiNote, 0x64]);
                 
-                deltaTime = index === 0 ? 0 : 60;
+                deltaTime = index === 0 ? 0 : 40; // Tighter spacing for more notes
             });
             
             trackEvents.push([0x00, 0xFF, 0x2F, 0x00]);
@@ -1365,25 +1481,44 @@
                 const timestamp = Date.now();
                 const filename = `sheet-music-transcription-${timestamp}.txt`;
                 
+                // Group notes by staff lines for analysis
+                const staffLines = {};
+                professionalNotes.forEach(note => {
+                    if (!staffLines[note.staffLine]) {
+                        staffLines[note.staffLine] = [];
+                    }
+                    staffLines[note.staffLine].push(note);
+                });
+                
                 const textContent = `I (Heart) Music Notes - Professional Sheet Music Transcription
 Generated: ${new Date().toLocaleString()}
 
-=== SHEET MUSIC TRANSCRIPTION ===
+=== MULTI-LINE SHEET MUSIC TRANSCRIPTION ===
 ${currentTranscription}
+
+=== STAFF LINE BREAKDOWN ===
+${Object.keys(staffLines).map(staffIndex => {
+    const staffNotes = staffLines[staffIndex];
+    return `Staff Line ${parseInt(staffIndex) + 1}: ${staffNotes.length} notes\n${staffNotes.map((note, i) => {
+        const timeStamp = ((note.timestamp - recordingStartTime) / 1000).toFixed(1);
+        return `  ${i + 1}. Time: ${timeStamp}s | Note: ${note.note} | Rhythm: ${note.rhythm} | Chord: ${note.chord}`;
+    }).join('\n')}`;
+}).join('\n\n')}
 
 === DETAILED NOTE SEQUENCE ===
 ${professionalNotes.map((note, i) => {
     const timeStamp = ((note.timestamp - recordingStartTime) / 1000).toFixed(1);
-    return `${i + 1}. Time: ${timeStamp}s | Note: ${note.note} | Rhythm: ${note.rhythm} | Chord: ${note.chord}`;
+    return `${i + 1}. Time: ${timeStamp}s | Staff: ${note.staffLine + 1} | Note: ${note.note} | Rhythm: ${note.rhythm} | Chord: ${note.chord}`;
 }).join('\n')}
 
 === MUSICAL ANALYSIS ===
 • Total Notes Recorded: ${professionalNotes.length}
+• Staff Lines Used: ${Object.keys(staffLines).length}
 • Recording Duration: ${recordingStartTime ? ((Date.now() - recordingStartTime) / 1000).toFixed(1) : 'N/A'} seconds
 • Key Signature: ${chords[Math.floor(Math.random() * chords.length)]} Major
 • Time Signature: 4/4
 • Estimated Tempo: ${110 + Math.floor(Math.random() * 30)} BPM
-• Note Range: ${Math.min(...professionalNotes.map(n => notes.indexOf(n.note)))} to ${Math.max(...professionalNotes.map(n => notes.indexOf(n.note)))}
+• Average Notes per Staff: ${(professionalNotes.length / Object.keys(staffLines).length).toFixed(1)}
 
 === NOTE STATISTICS ===
 ${notes.map(note => {
@@ -1396,7 +1531,8 @@ ${professionalNotes.map(note => note.chord).filter((chord, index, arr) => arr.in
 
 ---
 Generated by I (Heart) Music Notes Professional System
-Complete transcription and analysis of your recorded music performance
+Complete multi-line transcription and analysis of your recorded music performance
+Total Staff Lines: ${Object.keys(staffLines).length}
 File created: ${new Date().toLocaleString()}
 `;
                 
@@ -1432,12 +1568,14 @@ File created: ${new Date().toLocaleString()}
             placeholder.style.display = 'block';
             liveNotation.innerHTML = '';
             
-            const existingNotes = staffContainer.querySelectorAll('.note-element, .ledger-line');
-            existingNotes.forEach(note => note.remove());
+            // Clear all staff lines
+            staffSystem.innerHTML = '';
             
             currentTranscription = '';
             professionalNotes = [];
             noteCounter = 0;
+            currentStaffLine = 0;
+            notesInCurrentStaff = 0;
             
             downloadSection.style.display = 'none';
             downloadControls.classList.remove('show');
@@ -1449,7 +1587,6 @@ File created: ${new Date().toLocaleString()}
             paymentAuthorized = false;
             currentTransactionId = null;
             
-            // Re-enable recording button
             recordBtn.disabled = false;
             
             if (isRecording) {
@@ -1475,26 +1612,24 @@ File created: ${new Date().toLocaleString()}
 
         // Initialize
         window.addEventListener('load', () => {
-            console.log('I (Heart) Music Notes Professional - Loading with PayPal Integration...');
+            console.log('I (Heart) Music Notes Professional - Loading with Multi-Line Support...');
             
-            // Load usage data
             loadUsageData();
             
-            // Initialize PayPal
             setTimeout(() => {
                 initializePayPal();
                 console.log('PayPal integration initialized');
             }, 1000);
             
-            // Initialize audio
             setTimeout(() => {
                 initializeAudio();
-                console.log('All systems ready: Usage tracking, PayPal payments, and music transcription!');
+                console.log('Multi-line sheet music system ready!');
             }, 1500);
         });
     </script>
 </body>
 </html>
+
 
 
 
